@@ -1,142 +1,216 @@
+// Imports
 import fisica.*;
 import java.lang.Math.*;
-static int h;
-static int w;
-static PVector origin;
-static float center_x = w/2;
-static float center_y = h/2;
-//static ArrayList<Luca> all = new ArrayList<Luca>();
-static ArrayList<FBlob> all = new ArrayList<FBlob>();
-static Luca l2 = null;
+//import org.jbox2d.*;
+
+// Set center
+float center_x = width/2;
+float center_y = height/2;
+
+// Create ArrayList
+static ArrayList<Luca> all = new ArrayList<Luca>();
+
+// Declare world and Luca
 FWorld world;
+Luca l;
 
+// Returns true if there is contact
+boolean touching = false;
 
-void setup() 
-{
+// Set up world
+void setup() {
   
+  // Set frame size and background
   size(1000, 1000);
   background(220, 55, 55);
   
+  // Initialize fisica
   Fisica.init(this);
-  //Luca l = new Luca();
-  FBlob luca = new FBlob();
-  luca.setAsCircle(500, 500, 50);
-  
+
+  // Instantiate world and set edges and gravity
   world = new FWorld();
   world.setEdges();
   world.setGravity(0, 0);
-  luca.setFillColor(color(68, 56, 98));
-  world.add(luca);
-  all.add(luca);
-  
-
-  h = height;
-  w = width;
-  
-  origin = new PVector(w, h);
-  
-  //l.spawn();
-  //display(l);
-  
-  
 }
-static boolean made = false;
-void draw() 
-{
+int c = 0;
+
+// Draw
+void draw() {
   
+  // Draw background
   drawBack();
+  // Next frame
   world.step();
+  
+  // Draw everything in the world
   world.draw();
   
-  FBlob child = new FBlob();
-  
-  if(!made && all.size() > 0)
+  // If no Lucas exist
+  if(all.size() < 1)
   {
-    for(int i = 0; i < all.get(0).getVertexBodies().size(); i++) {
-      
-      float x = all.get(0).getVertexX(i);
-      float y = all.get(0).getVertexY(i);
-      
-      child.vertex(x, y);
-    }
+    // Create a Luca
+    // Constructor sets the blob as a circle at the designated location with a radius of 50
+    // Also tried using Blobs instead of Luca and setting it as a circle in setup() with no luck
+    // Tried explicitly setting the initial position with no luck
+    l = new Luca(500, 500);
     
-    //child.setPosition(all.get(0).getX(), all.get(0).getY());
-    all.add(child);
-      
-    world.add(child);
-    made = true;
-  }  
-  if(all.size() >= 2)
-  {
     
-    float rand = random(200, 400);
-    float rand2 = random(200, 400);
-    println(all.get(1).getX());
+    // Set friction
+    l.setFriction(0);
+    // Set color of Luca
+    l.setFillColor(color(68, 56, 98));
     
-    //if(all.get(0).isTouchingBody(all.get(1)))
-    if(abs(all.get(0).getX()) - all.get(1).getX() < 10 || abs(all.get(0).getY()) - all.get(1).getY() < 10)
-  {
-    
-    all.get(0).addForce(rand, rand2);
-    all.get(1).addForce(rand*(-1), rand2*(-1));
-    print(all.get(1).getVelocityX());
-    
+    // Add the Luca to the ArrayList
+    all.add(l);
+    // Add the Luca to the world
+    world.add(l);
   }
   
-    if(all.get(0).isTouchingBody(all.get(1)))
+  // For every Luca in the ArrayList
+  for(int i = 0; i < all.size(); i++)
+  {
+    
+    // Increase its stamina
+    all.get(i).stam++;
+    
+    //if(c == 0)
+    //{
+    //*****
+    // Uncomment to see tracking of position and velocity using both attributes and get methods during movement
+    //
+    // all.get(i).move(10, 10);
+    //
+    //*****
+    //c++;
+    //}
+    // If the Luca is not moving and has at least 200 stamina
+    if(all.get(i).velX < 1 && all.get(i).velY < 1 && all.get(i).stam >= 200)
+    {
+      // It replicates
+      split(all.get(i));
+    }
+    
+    // No effect, handles in contactPersisted method
+    /*
+    if(touching)
     {
       
-      all.get(0).setVelocity(0, 0);
-      all.get(1).setVelocity(0, 0);
+      // Pick a random location within the Lucas' range
+      float x1 = random(-luca.speed, luca.speed);
+      float y1 = random(-luca.speed, luca.speed);
+      float x2 = random(-child.speed, child.speed);
+      float y2 = random(-child.speed, child.speed);
       
+      // Move to those locations
+      luca.move(x1, y1);
+      println("POS" + luca.posX);
+      child.move(x2, y2);
+      
+    }*/
+    
+    // If more than one Luca exists
+    if(all.size() > 1)
+    {
+      // Print the original Luca's position and velocity values
+      println("posX: " + all.get(0).posX + " | posY: " + all.get(0).posY + " | velX: " + all.get(0).velX + " | velY: " + all.get(0).velY);
+      println("getX(): " + all.get(0).getX() + " | getY(): " + all.get(0).getY() + " | getVelocityX(): " + all.get(0).getVelocityX() + " | getVelocityY: " + all.get(0).getVelocityY());
     }
   }
+}
+
+// Global variable
+Luca child;
+
+// To replicate a Luca //<>//
+void split(Luca luca)
+{
   
-  //println(child.getVertexX(50));
+  // If the Luca exists and has more than 200 stamina
+  if(luca != null && luca.stam > 200) 
+  {
+    
+    // If there is no contact
+    if(!touching)
+    {
+      // Spawn a Luca
+      // The line should spawn a child Luca on top of its parent
+      // However, since its not tracking position or velocity,
+      // it uses the original position of the first luca every time
+      child = luca.spawn();
+      
+      // Using move method here doesn't work. Either doesn't change values or updates them without end
+    
+    }
+    
+    // Set their staminas to zero
+    child.stam = 0;
+    luca.stam = 0;
+    //println("Parent: " + luca.stam + " Child: " + child.stam);
+  }
   
-  
+  // Add joint
   /*
-  //for(int i = 0; i<Luca.all.size(); i++)
-  //{
-    
-    Luca l = all.get(0);
-      
-      // Uncomment one at a time to see result
-      
-      l2 = l.split();
-      display(l);
-      display(all.get(1));
-      
-      
-    if(Species.num_species == 1)
-    {
-       //<>//
-      PVector dest1 = new PVector(600, 240);
-      
-      // Uncomment one at a time to see result
-      //l.move(dest1);
-      
-      // Uncomment one at a time to see result
-      //l.moveRandom();
-      
-      // Uncomment one at a time to see result
-      //l.move(270);
-      
-      //display(l);
-    }
-  //}
+  FDistanceJoint j = new FDistanceJoint(luca, child);
+  j.setLength(5);
+  j.addToWorld(world);
   */
 }
 
+  // Defines what happens when contact is initiated
+  void contactStarted(FContact contact) {
+    
+    // Set global variable to true
+    touching = true;
+    
+    // Draw in green an ellipse where the contact started
+    fill(0, 170, 0);
+    ellipse(contact.getX(), contact.getY(), 20, 20);
+ }
+ 
+  // Defines what happens when contact persists
+  void contactPersisted(FContact contact) {
+    
+    // Cannot use update() method here. Only Contact and FBody methods
+    
+    // Set global variable to true
+    touching = true;
+   
+    // Separate
+    contact.getBody1().addForce(2000, 2000); 
+    contact.getBody2().addForce(-2000, -2000);
+    
+    // Draw in blue an ellipse where the contact took place
+    fill(0, 0, 170);
+    ellipse(contact.getX(), contact.getY(), 10, 10);
+    
+ }
+ 
+ // Defines what happens when contact ends
+ void contactEnded(FContact contact)
+ {
+   // Set global variable to false
+   touching = false;
+   
+   // Stop motion
+   contact.getBody1().resetForces();
+   contact.getBody1().setVelocity(0, 0);
+   contact.getBody2().resetForces();
+   contact.getBody2().setVelocity(0, 0);
+   
+   // Show when/where contact ends in red
+   fill(170, 0, 0);
+   ellipse(contact.getX(), contact.getY(), 10, 10);
+   
+ }
+
 /*
-// Draw Luca
-void display(Luca l)
+// Set a Luca's stamina
+ void setStam(Luca l, float stam)
 {
-  world.draw();
-  // Will change for Box2D
-  //ellipse(l.loc.x, l.loc.y, l.cell_w, l.cell_h);
+  l.stam = stam;
 }
 */
+
 // Draw background
 void drawBack()
 {

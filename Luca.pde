@@ -1,5 +1,5 @@
 // A class to create Luca objects (cells) and provide all of its functionality
-class Luca
+class Luca extends FBlob
 {
   // Attributes
   float cell_w;
@@ -20,16 +20,39 @@ class Luca
   // For moveRandom method
   PVector dest;
   float rand;
+  
+  // Luca ID number
+  int count = 1;
+  
+  float mass;
+  
+  float forceX = 0;
+  float forceY = 0;
+  float accX = 0;
+  float accY = 0;
+  float velX = 0;
+  float velY = 0;
+  float posX = 500;
+  float posY = 500;
+  
  
  // Default constructor
   Luca()
   {
+    super();
     // Spawns in center of screen
-    this.loc = new PVector(w/2, h/2);
+    this.posX = 500;
+    this.posY = 500;
+    this.velX = 0;
+    this.velY = 0;
+    this.accX = 0;
+    this.accY = 0;
+    this.forceX = 0;
+    this.forceX = 0;
     this.vel = new PVector(0, 0);
     this.acc = new PVector(.5, -.5);
     this.speed = .9;
-    this.stam = 100;
+    this.stam = 0;
     this.cell_w = 50;
     this.cell_h = 50;
     //this.cell_center_x = (cell_x + cell_w)/2;
@@ -39,16 +62,63 @@ class Luca
     this.parent = null;
     this.child = null;
     this.dest = null;
+    this.mass = 1;
+    this.count = count;
+    count++;
+    this.setAsCircle(500, 500, 50);
+    this.setPosition(500, 500);
+    
   }
   
+  Luca(float x, float y)
+  {
+    super();
+    this.posX = x;
+    this.posY = y;
+    this.velX = 0;
+    this.velY = 0;
+    this.accX = 0;
+    this.accY = 0;
+    this.forceX = 0;
+    this.forceY = 0;
+    // Spawns in center of screen
+    this.loc = new PVector(center_x, center_y);
+    this.vel = new PVector(0, 0);
+    this.acc = new PVector(.5, -.5);
+    this.speed = .9;
+    this.stam = 0;
+    this.cell_w = 50;
+    this.cell_h = 50;
+    //this.cell_center_x = (cell_x + cell_w)/2;
+    //this.cell_center_y = (cell_y + cell_h)/2;
+    this.rep_rate = 1;
+    this.species_num = 0;
+    this.parent = null;
+    this.child = null;
+    this.dest = null;
+    this.mass = 1;
+    count++;
+    this.setAsCircle(x, y, 50);
+    //this.setPosition(x, y);
+  }
+  /*
   // Constructor with parameters
   Luca(float x, float y, float cell_w, float cell_h, int species_num, float speed, float rep_rate)
   {
+    super();
+    this.posX = x;
+    this.posY = y;
+    this.velX = 0;
+    this.velY = 0;
+    this.accX = 0;
+    this.accY = 0;
+    this.forceX = 0;
+    this.forceY = 0;
     this.loc = new PVector(x, y);
     this.vel = new PVector(0, 0);
     this.acc = new PVector(0, 0);
     this.speed = speed;
-    this.stam = 200;
+    this.stam = 0;
     this.cell_w = cell_w;
     this.cell_h = cell_h;
     //this.cell_center_x = (loc.x + cell_w)/2;
@@ -56,11 +126,96 @@ class Luca
     this.rep_rate = rep_rate;
     this.species_num = species_num;
     this.dest = null;
+    this.mass = 1;
+    count++;
+  }
+  */
+  
+  /*
+  // Set Luca's stamina attribute
+  void setStam(float stam)
+  {
+    this.stam = stam;
+  }
+  */
+  
+  // Spawn a child Luca in the same position as its parent
+  Luca spawn()
+  {
+    // Create new Luca object
+    // this.getX() and this.getY() are not updating, so they spawn in the center
+    Luca child = new Luca(this.posX, this.posY);
     
-    // Adds the new Luca to the static ArrayList
-    all.add(this);
+    // Using get methods, it spawns the first and second lucas in the center, then they start spawning on the edges
+    // Luca child = new Luca(this.getX(), this.getY());
+    
+    // For each vertex of the parent
+    for (int i = 0; i < this.getVertexBodies().size(); i++) 
+    {
+      // Create the same vertex for the child
+      child.vertex(this.getVertexX(i), this.getVertexY(i));
+    }
+    // Set the new Luca (Blob) as a circle
+    child.setAsCircle(this.posX, this.posY, 50);
+    
+    // Add it to the ArrayList
+    all.add(child);
+    // Add it to the world
+    world.add(child);
+    // Return the new Luca
+    return child;
+  }
+  //int d = 0;
+  // Move to given (x, y) coordinates
+  void move(float x, float y)
+  {
+    //if(d < 50)
+    //{
+    // Set force attributes
+    this.forceX = x;
+    this.forceY = y;
+    
+    // Add the force
+    this.addForce(this.forceX, this.forceY);
+    
+
+    //d++;
+    //}
+    // Update position and velocity attributes
+    this.update();
+    // Print tracked values
+    println("posX: " + this.posX + " | posY: " + this.posY + " | velX: " + this.velX + " | velY: " + this.velY);
+    println("getX(): " + this.getX() + " | getY(): " + this.getY() + " | getVelocityX(): " + this.getVelocityX() + " | getVelocityY: " + this.getVelocityY());
+    
+    
+  }
+  int j = 0;
+  // Update position and velocity attributes
+  void update()
+  {
+    // Calculate acceleration based on the forces applied
+    this.accX = this.forceX / this.mass;
+    this.accY = this.forceY / this.mass;
+    
+    // Update velocity based on acceleration
+    this.velX += this.accX;
+    this.velY += this.accY;
+    
+    if(j == 0)
+    {
+    // Adjust to new velocity
+    //this.adjustVelocity(this.accX, this.accY);
+    j++;
+    }
+    // Update position based on velocity
+    this.posX += this.velX;
+    this.posY += this.velY;
+    
+    // Adjust to position
+    //this.adjustPosition(this.getVelocityX(), this.getVelocityY());
   }
   
+  /*
   // Sets the current Luca object as the parent of another
   void setParent(Luca l)
   {
@@ -72,9 +227,10 @@ class Luca
   {
     this.child = l;
   }  
+  */
   
   //~~~~~~~~SPAWNING~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+  /*
   // Spawns a cell in the center of the environment
   void spawn()
   {
@@ -97,10 +253,10 @@ class Luca
     all.add(this);
     return this;
   }
-  
+  */
   //~~~~~~~~MOVEMENT~~~~~~~~~~~~~~~~~~~~~~~~~~
   
-  
+  /*
   
   // Check if Luca touches edge
   void checkEdges() {
@@ -119,6 +275,7 @@ class Luca
       loc.y = height;
     }
     */
+    /*
   }
      
   // Set speed (magnitude of acceleration vector)
@@ -128,7 +285,7 @@ class Luca
     this.acc.normalize();
     this.acc.mult(this.speed);
   }
-  
+  /*
   // Set the distance a Luca travels, based on its stamina
   void setDist(PVector point)
   {
@@ -158,7 +315,7 @@ class Luca
     // Add force vector to acceleration vector
     this.acc.add(force);
   }
-  
+/*  
   //************Helpers**********
   // Helper method for helper method to set the direction of the acceleration vector
   private void moveDir(PVector dest, PVector loc)
@@ -272,7 +429,7 @@ class Luca
       // Set a new destination
       this.dest = new PVector(random(this.loc.x - this.stam, this.loc.x + this.stam), random(this.loc.y - this.stam, this.loc.y + this.stam));
     }
-    // Move Luca to it
+    // Move Luca to it, this will limit the radius to the available stamina
     this.move(this.dest);
   }
   
@@ -294,6 +451,8 @@ class Luca
     // Create vector from angle
     
     PVector dir = PVector.fromAngle(radians);
+    
+    this.dest = dir;
     
     // Set direction of acceleration vector
     this.moveDir();
@@ -370,7 +529,7 @@ class Luca
   
   
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+  /*
   // Replication
   // Split one Luca into two
   Luca split()
@@ -385,7 +544,7 @@ class Luca
     // Move parent in random direction
     rand = random(360);
     this.move(rand);
-    
+    /*
     // Add to ArrayList if not already there
     if(!all.contains(l2))
     {
@@ -400,11 +559,12 @@ class Luca
     this.setChild(l2);
     this.setParent(l2);
     l2.setChild(this);
-    
+    */
     // Return child
+    /*
     return l2;
   }
-  
+  */
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    //<>//
   /*
@@ -415,7 +575,7 @@ class Luca
   */
   
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+  /*
   PVector getCellX()
   {
     return this.loc;
@@ -472,7 +632,7 @@ class Luca
   
   String toString()
   {
-    String str = "Species number: " + this.getSpeciesNum() + "\n";
+    String str = "Luca number: " + this.count + "\n";
     return str;
   }
 }
