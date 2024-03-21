@@ -15,6 +15,14 @@ run/main_scene="res://environment.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[debug]
+
+gdscript/templates_search_path="res://script_templates"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/anim_player_refactor/plugin.cfg")
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

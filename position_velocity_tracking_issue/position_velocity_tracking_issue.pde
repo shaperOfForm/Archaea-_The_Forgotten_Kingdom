@@ -27,7 +27,10 @@ void setup() {
   world.setGravity(0, 0);
   
   //Add luca to the world
+  //l.setPosition(500, 500);
+  //l.setVelocity(200.0, 200.0);
   world.add(l);
+  
 }
 
 // Declare variables to store position and velocity
@@ -61,11 +64,13 @@ void draw() {
   posY += velY;
   
   // Apply the force
-  l.addForce(10, 10);
+  l.addForce(100, 1);
+  
   
   // Print the updated position and velocity values
+  println("getForceY()" + l.getForceY());
   println("\ngetX(): " + l.getX() + " getY(): " + l.getY() + " getVelocityX(): " + l.getVelocityX() + " getVelocityY(): " + l.getVelocityY());
-  println("\nPosX: " + posX + " PosY: " + posY + " VelX: " + velX + " VelY: " + velY);
+  //println("\nPosX: " + posX + " PosY: " + posY + " VelX: " + velX + " VelY: " + velY);
 }
   
 // Draw background
