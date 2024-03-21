@@ -1,17 +1,69 @@
+class Luca extends FBlob
+{
+ 
+  FCircle bound;
+  float size = 50;
+  float stam = 0;
+  
+  
+  Luca(float x, float y)
+  {
+    
+    this.setAsCircle(x, y, size);
+    this.setFilterBits(1);
+    this.setCategoryBits(1);
+    this.stam = 0.0;
+    this.bound = new FCircle(70);
+    this.bound.setFilterBits((int)random(4, 7));
+    this.bound.setPosition(x, y);
+    //this.bound.setPosition(x, y);
+    //this.bound.setStatic(false);
+    
+    world.add(this);
+    circles.add(this.bound);
+    world.add(this.bound);
+    
+    all.add(this);
+    
+  }
+  // Override the setPosition method of FBlob to automatically update the FCircle position
+  @Override
+  void setPosition(float x, float y) {
+    super.setPosition(x, y);
+    this.bound.setPosition(x, y); // Update FCircle position
+  }
+  
+  void drawCircle(PApplet p)
+  {
+    //this.bound.setFilterBits(2);
+    this.bound.draw(p);
+  }
+  
+}
+
+
+
+
+
+
+
+
+
+/*
 // A class to create Luca objects (cells) and provide all of its functionality
 class Luca extends FBlob
 {
   // Attributes
-  float cell_w;
-  float cell_h;
+  float size;
   PVector loc;
   PVector vel;
   PVector acc;
   float speed;
+  float max_stam;
   float stam;
   float rep_rate;
   int species_num;
-  
+  String diet;
   Luca parent;
   Luca child;
   
@@ -26,6 +78,7 @@ class Luca extends FBlob
   
   float mass;
   
+  
   float forceX = 0;
   float forceY = 0;
   float accX = 0;
@@ -34,6 +87,12 @@ class Luca extends FBlob
   float velY = 0;
   float posX = 500;
   float posY = 500;
+  
+  
+  Species spec;
+  
+  float range;
+  boolean can_move = true;
   
  
  // Default constructor
@@ -53,8 +112,6 @@ class Luca extends FBlob
     this.acc = new PVector(.5, -.5);
     this.speed = .9;
     this.stam = 0;
-    this.cell_w = 50;
-    this.cell_h = 50;
     //this.cell_center_x = (cell_x + cell_w)/2;
     //this.cell_center_y = (cell_y + cell_h)/2;
     this.rep_rate = 1;
@@ -65,8 +122,12 @@ class Luca extends FBlob
     this.mass = 1;
     this.count = count;
     count++;
-    this.setAsCircle(500, 500, 50);
+    this.size = 50;
+    this.setAsCircle(500, 500, this.size);
     this.setPosition(500, 500);
+    this.spec = new Species();
+    this.rand = (float)random(0, 1);
+    this.range = 50;
     
   }
   
@@ -82,15 +143,11 @@ class Luca extends FBlob
     this.forceX = 0;
     this.forceY = 0;
     // Spawns in center of screen
-    this.loc = new PVector(center_x, center_y);
+    this.loc = new PVector(width/2, height/2);
     this.vel = new PVector(0, 0);
     this.acc = new PVector(.5, -.5);
     this.speed = .9;
     this.stam = 0;
-    this.cell_w = 50;
-    this.cell_h = 50;
-    //this.cell_center_x = (cell_x + cell_w)/2;
-    //this.cell_center_y = (cell_y + cell_h)/2;
     this.rep_rate = 1;
     this.species_num = 0;
     this.parent = null;
@@ -98,7 +155,13 @@ class Luca extends FBlob
     this.dest = null;
     this.mass = 1;
     count++;
-    this.setAsCircle(x, y, 50);
+    this.size = 50;
+    this.setAsCircle(x, y, this.size);
+    if(parent != null)
+    {
+    this.spec = parent.spec;
+    }
+    this.range = 50;
     //this.setPosition(x, y);
   }
   /*
@@ -139,12 +202,43 @@ class Luca extends FBlob
   }
   */
   
+  /*
+  // I need the Species to be a base, and the Luca class to add offsets to it when they mutate
+  void mutate(String mutation)
+  {
+    if(this.spec.mut_rate > rand)
+    {
+      float rand;
+      switch(mutation)
+      {
+        case "canmove":
+          this.can_move = true;
+          break;
+        case "size":
+          rand = random(-20, 20);
+          this.size += rand;
+          this.mass += rand*.05;
+          break;
+        case "max_stam":
+          rand = random(-40, 40);
+          this.max_stam += rand;
+          break;
+        case "rep_rate":
+          rand = random(-10, 10);
+          this.rep_rate += rand;
+          break;
+        default:
+          println("ERROR: Check the mutate parameter");
+      }
+    }
+  }
+  
   // Spawn a child Luca in the same position as its parent
   Luca spawn()
   {
     // Create new Luca object
     // this.getX() and this.getY() are not updating, so they spawn in the center
-    Luca child = new Luca(this.posX, this.posY);
+    Luca child = new Luca(this.getVertexX(0), this.getVertexY(0));
     
     // Using get methods, it spawns the first and second lucas in the center, then they start spawning on the edges
     // Luca child = new Luca(this.getX(), this.getY());
@@ -157,7 +251,8 @@ class Luca extends FBlob
     }
     // Set the new Luca (Blob) as a circle
     child.setAsCircle(this.posX, this.posY, 50);
-    
+    child.setParent(this);
+    this.child = child;
     // Add it to the ArrayList
     all.add(child);
     // Add it to the world
@@ -165,6 +260,7 @@ class Luca extends FBlob
     // Return the new Luca
     return child;
   }
+  int s = 0;
   //int d = 0;
   // Move to given (x, y) coordinates
   void move(float x, float y)
@@ -175,24 +271,31 @@ class Luca extends FBlob
     this.forceX = x;
     this.forceY = y;
     
+    if(s < 5000)
+    {
     // Add the force
     this.addForce(this.forceX, this.forceY);
-    
-
+    //this.adjustVelocity(this.forceX, this.forceY);
+    //this.adjustVelocity(10, 10);
     //d++;
     //}
     // Update position and velocity attributes
     this.update();
+    s++;
+    this.stam--;
     // Print tracked values
-    println("posX: " + this.posX + " | posY: " + this.posY + " | velX: " + this.velX + " | velY: " + this.velY);
-    println("getX(): " + this.getX() + " | getY(): " + this.getY() + " | getVelocityX(): " + this.getVelocityX() + " | getVelocityY: " + this.getVelocityY());
-    
+    //println("posX: " + this.posX + " | posY: " + this.posY + " | velX: " + this.velX + " | velY: " + this.velY);
+    //println("getX(): " + this.getX() + " | getY(): " + this.getY() + " | getVelocityX(): " + this.getVelocityX() + " | getVelocityY: " + this.getVelocityY());
+    }
+    //this.adjustPosition(this.getVelocityX(), this.getVelocityY());
     
   }
   int j = 0;
   // Update position and velocity attributes
   void update()
   {
+    if(j == 0)
+    {
     // Calculate acceleration based on the forces applied
     this.accX = this.forceX / this.mass;
     this.accY = this.forceY / this.mass;
@@ -201,18 +304,30 @@ class Luca extends FBlob
     this.velX += this.accX;
     this.velY += this.accY;
     
+    }
+  }
+    
+    /*
     if(j == 0)
     {
     // Adjust to new velocity
     //this.adjustVelocity(this.accX, this.accY);
     j++;
     }
-    // Update position based on velocity
-    this.posX += this.velX;
-    this.posY += this.velY;
+    */
+
+    /*
+    //this.addForce(-2, -5);
+    //this.adjustVelocity(10, 10);
     
+    println("X:" +this.getX()); //<>//
+    j++;
     // Adjust to position
     //this.adjustPosition(this.getVelocityX(), this.getVelocityY());
+    }
+        // Update position based on velocity
+    this.posX += this.velX;
+    this.posY += this.velY;
   }
   
   /*
@@ -480,92 +595,10 @@ class Luca extends FBlob
       drawBack();
     }
   }
-  
-  // Move to designated location on the screen at a set speed
-  /*public void move(float dest_x, float dest_y, float speed)
-  {   
-    /*
-    // While the Luca is the the LEFT of its destination x-coordinate
-    if(this.loc.x < dest_x)
-    {
-      // If is still to the LEFT of its destination x-coordinate
-      if(this.cell_x < dest_x)
-      {
-        // Increment x-location by speed
-        this.cell_x = this.cell_x + speed;
-      }
-    }
-    // While the Luca is the the RIGHT of its destination x-coordinate
-    if(this.cell_x > dest_x)
-    {
-      // If is still to the RIGHT of its destination x-coordinate
-      if(this.cell_x > dest_x)
-      {
-        // Decrement x-location by speed
-        this.cell_x = this.cell_x - speed;
-      }
-    }
-    // While the Luca is the the ABOVE of its destination y-coordinate
-    if(this.cell_y < dest_y)
-    {
-      // If is still to the ABOVE of its destination x-coordinate
-      if(this.cell_y < dest_y)
-      {
-        // Increment y-location by speed
-        this.cell_y = this.cell_y + speed;
-      }
-    }
-    // While the Luca is the the BELOW of its destination y-coordinate
-    if(this.cell_y > dest_y)
-    {
-      // If is still to the BELOW of its destination x-coordinate
-      if(this.cell_y > dest_y)
-      {
-        // Decrement y-location by speed
-        this.cell_y = this.cell_y - speed;
-      }
-    }
-  }*/
-  
-  
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  /*
-  // Replication
-  // Split one Luca into two
-  Luca split()
-  {
-    // if Luca 2 is not yet stored
-    if(l2 == null)
-    {
-      // Spawn second Luca on top of the first
-      l2 = this.spawn(this);
-    }
-    
-    // Move parent in random direction
-    rand = random(360);
-    this.move(rand);
-    /*
-    // Add to ArrayList if not already there
-    if(!all.contains(l2))
-    {
-      all.add(l2);
-    }
-    
-    // Move child in random direction
-    all.get(1).move(rand-180);
-    
-    // Set children and parent of both Lucas
-    l2.setParent(this);
-    this.setChild(l2);
-    this.setParent(l2);
-    l2.setChild(this);
-    */
-    // Return child
-    /*
-    return l2;
-  }
   */
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+  
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    //<>//
   /*
   void phage(Luca prey)
@@ -629,10 +662,11 @@ class Luca extends FBlob
     }
   }
   */
-  
+  /*
   String toString()
   {
     String str = "Luca number: " + this.count + "\n";
     return str;
   }
 }
+*/

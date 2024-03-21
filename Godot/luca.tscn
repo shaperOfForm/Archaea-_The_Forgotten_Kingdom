@@ -1,0 +1,36 @@
+[gd_scene load_steps=9 format=3 uid="uid://cdg1jr3aw7uto"]
+
+[ext_resource type="Script" path="res://luca.gd" id="1_4nive"]
+[ext_resource type="Texture2D" uid="uid://cpoxpltotbc7j" path="res://icon.svg" id="1_dxmuw"]
+[ext_resource type="Shader" path="res://luca.gdshader" id="1_k8fp1"]
+[ext_resource type="Texture2D" uid="uid://l1disbe2emdb" path="res://cell.png" id="2_s1dlu"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bsn2k"]
+radius = 38.0
+height = 90.0
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_l7ghd"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_sabjh"]
+noise = SubResource("FastNoiseLite_l7ghd")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eqr01"]
+shader = ExtResource("1_k8fp1")
+shader_parameter/overlay_texture = ExtResource("2_s1dlu")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_sabjh")
+
+[node name="luca" type="Node2D"]
+script = ExtResource("1_4nive")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+position = Vector2(196, 183)
+gravity_scale = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
+position = Vector2(428, 174)
+shape = SubResource("CapsuleShape2D_bsn2k")
+
+[node name="Sprite2D" type="Sprite2D" parent="RigidBody2D/CollisionShape2D"]
+material = SubResource("ShaderMaterial_eqr01")
+position = Vector2(-1, -2)
+texture = ExtResource("1_dxmuw")

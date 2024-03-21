@@ -1,3 +1,541 @@
+
+
+
+
+/*
+
+ArrayList<Float> xCoor = new ArrayList<Float>();
+ArrayList<Float> yCoor = new ArrayList<Float>();
+float x_pos;
+float y_pos;
+
+void setup(){
+size(500,500);
+background(255);
+fill(0);
+smooth();
+frameRate(11);
+x_pos = 0;
+y_pos = 0;
+}
+
+
+void draw(){
+  background(255);
+  create(200, 100, 20);
+  create(x_pos++, y_pos, 20);
+}
+void create(float x, float y, float radius)
+{
+  translate(x, y);
+  int index = 0;
+  noFill();
+  beginShape();
+  stroke(0,0,255);
+  fill(0,0,255);
+  for(float i = 0; i < TWO_PI; i = i + 0.2){
+  
+    float x1 = sin(i) * radius;
+    float y1 = cos(i) * radius;
+    
+    float yOffset = random(-1,1);
+    float xOffset = random(-1,1);
+    
+    x1 = x1 + xOffset;
+    y1 = y1 + yOffset;
+    
+    xCoor.add(x1);
+    yCoor.add(y1);
+    curveVertex(x1,y1);
+    //ellipse(x1,y1,5,5);
+  
+  }
+  
+  endShape(CLOSE);
+  stroke(255,0,0);
+  //ellipse(0,0,radius*2,radius*2);
+}
+
+
+
+
+
+
+/**
+ *  Contacts
+ *
+ *  by Ricard Marxer
+ *
+ *  This example shows how to use the contact events.
+ */
+ 
+ 
+import fisica.*;
+import java.lang.reflect.*;
+
+FWorld world;
+
+ArrayList<FCircle> circles = new ArrayList<FCircle>();
+
+ArrayList<Luca> all = new ArrayList<Luca>();
+
+int count = 0;
+
+void setup() {
+  size(400, 400);
+  smooth();
+
+  Fisica.init(this);
+  world = new FWorld();
+  
+  //FBlob b = spawn(100, 100);
+  
+  //bind(b);
+  
+  Luca l = new Luca(100, 100);
+  world.setGravity(0, 0);
+  
+  //world.add(l);
+  
+  //world.add(all.get(0));
+  
+}
+
+
+
+float radius = 50;
+
+void draw() {
+  background(255);
+
+
+  
+  for(int i = 0; i < all.size(); i++)
+  {
+    
+    for(Luca luca: all)
+    {
+      //luca.drawCircle(this);
+    }
+    
+    world.draw();
+    world.step();
+    
+    //println(get_vertex_x(all.get(i)));
+    
+    //bind(all.get(i));
+    
+    all.get(i).setPosition(get_vertex_x(all.get(i)), get_vertex_y(all.get(i)));
+    
+    all.get(i).stam++;
+  
+    //luca.addForce(100, 0);
+    
+    //println(all.get(i).stam);
+    
+    if(all.get(i).stam > 200)
+    {
+      //println("hello");
+      split(all.get(i));
+      all.get(i).stam = 0.0;
+    }
+    
+  }
+
+
+/*
+    //Do once
+    if (count == 0) {
+      //Create blob. Add to world
+      
+      FBlob b2 = spawn(200, 100);
+      bind(b2);
+      //println(all.get(0));
+      //println(all.get(1));
+      
+      
+      
+      world.add(all.get(1));
+      world.add(circles.get(0));
+      print(circles.get(0));
+      print("HELLO" + circles.get(1));
+  
+      world.add(circles.get(1));
+  
+  
+      count++;
+    }
+  for(FBlob blob: all)
+    {
+    //world.add(c);
+    //println(get_vertex_x(b));
+    circles.get(0).setPosition(get_vertex_x(all.get(0)), get_vertex_y(all.get(0)));
+  
+    // Move objects
+    blob.addForce(10, 0);
+    */
+    /*
+    strokeWeight(1);
+    stroke(255);
+    ArrayList contacts = b.getContacts();
+    for (int i=0; i<contacts.size(); i++) {
+      FContact c = (FContact)contacts.get(i);
+      line(c.getBody1().getX(), c.getBody1().getY(), c.getBody2().getX(), c.getBody2().getY());
+    }
+    */
+  //}
+  
+}
+
+
+
+// To replicate a Luca
+void split(Luca luca)
+{
+  
+  // If the Luca exists and has more than 200 stamina
+  //if(luca != null && luca.stam > 200) 
+  //{
+    
+    // If there is no contact
+    //if(!touching)
+    //{
+      // Spawn a Luca
+      // The line should spawn a child Luca on top of its parent
+      // However, since its not tracking position or velocity,
+      // it uses the original position of the first luca every time
+      if(luca.stam > 80.0)
+      {
+        Luca child = spawn(get_vertex_x(luca), get_vertex_y(luca));
+        
+        //luca.bound = new FCircle(70);
+        
+        luca.setPosition(get_vertex_x(luca), get_vertex_y(luca));
+        
+        luca.bound.setPosition(get_vertex_x(luca), get_vertex_y(luca));
+        
+        println("SPAWN: " + get_vertex_x(luca));
+        
+        luca.setFilterBits(1);
+        luca.setCategoryBits(1);
+        luca.bound.setFilterBits(2);
+        luca.bound.setCategoryBits(2);
+        
+        child.setFilterBits(1);
+        child.setCategoryBits(1);
+        child.bound.setFilterBits(3);
+        child.bound.setCategoryBits(3);
+        
+        luca.stam = 0;
+        child.stam = 0;
+      }
+      // Using move method here doesn't work. Either doesn't change values or updates them without end
+    
+    //}
+    
+    // Set their staminas to zero
+    //child.stam = 0;
+    //luca.stam = 0;
+    //println("Parent: " + luca.stam + " Child: " + child.stam);
+  //}
+}
+
+Luca spawn(float x, float y)
+{
+  Luca l = new Luca(x, y);
+  
+  //l.bound.setPosition(x, y);
+  
+  println("HELLO" + l.bound.getX());
+  //l.setFilterBits(1);
+  //l.bound.setFilterBits((int)random(0, 3));
+  
+  world.add(l.bound);
+  world.add(l);
+  
+  all.add(l);
+  
+  return l;
+}
+
+
+void bind(Luca l)
+{
+  //println(get_vertex_x(l));
+      // Keep the bounding circle around the cell
+    //l.setPosition(get_vertex_x(l), get_vertex_y(l));
+  /*
+    l.bound.setFilterBits(5);
+    
+    l.bound.setPosition(get_vertex_x(l), get_vertex_y(l));
+    
+    circles.add(l.bound);
+    
+    return(l.bound);
+    */
+
+
+}
+/*
+FBlob split(FBlob f)
+{
+  return spawn(get_vertex_x(f), get_vertex_y(f));
+}
+*/
+float get_vertex_x(FBlob blob)
+  {
+  float sum = 0;
+  String fieldToTest = "m_vertexBodies";
+  
+  try
+  {
+    Field f = FBlob.class.getDeclaredField(fieldToTest);
+    //Field f = FBlob.class.getSuperClass().getDeclaredField(fieldToTest);
+    f.setAccessible(true);
+    //println(fieldToTest + f.get(b));
+    ArrayList<FBody> bodies = (ArrayList<FBody>)f.get(blob);
+    for(FBody part : bodies) 
+    {
+      //println(parts.getX());
+      sum += part.getX();
+      //return part.getX();
+    }
+    return sum/bodies.size();
+  }
+  catch(Exception e)
+  {
+    e.printStackTrace();
+  }
+    return 0;
+}
+
+
+float get_vertex_y(FBlob blob)
+{
+  
+  float sum = 0;
+  
+  String fieldToTest = "m_vertexBodies";
+  try{
+  Field f = FBlob.class.getDeclaredField(fieldToTest);
+  //Field f = FBlob.class.getSuperClass().getDeclaredField(fieldToTest);
+  f.setAccessible(true);
+  //println(fieldToTest + f.get(b));
+  ArrayList<FBody> bodies = (ArrayList<FBody>)f.get(blob);
+  for(FBody part: bodies) {
+    
+    sum += part.getY();
+    //println(parts.getY());
+    
+    //return part.getY();
+  }
+  // Return the average
+    return sum/bodies.size();
+    }
+      catch(Exception e){
+      e.printStackTrace();
+    }
+    return 0;
+  }
+
+  // Defines what happens when contact is initiated
+  void contactStarted(FContact contact) {
+    
+    // Set global variable to true
+    //touching = true;
+    
+    // Draw in green an ellipse where the contact started
+    fill(0, 170, 0);
+    //ellipse(contact.getX(), contact.getY(), 20, 20);
+ }
+ 
+  // Defines what happens when contact persists
+  void contactPersisted(FContact contact) {
+    
+    // Cannot use update() method here. Only Contact and FBody methods
+    
+    // Set global variable to true
+    //touching = true;
+   
+    // Separate
+    contact.getBody1().addForce(300, 300); 
+    contact.getBody2().addForce(-300, -300);
+    
+    // Draw in blue an ellipse where the contact took place
+    fill(0, 0, 170);
+    //ellipse(contact.getX(), contact.getY(), 10, 10);
+    
+ }
+ 
+ // Defines what happens when contact ends
+ void contactEnded(FContact contact)
+ {
+   // Set global variable to false
+   //touching = false;
+   
+   // Stop motion
+   contact.getBody1().resetForces();
+   contact.getBody1().setVelocity(0, 0);
+   contact.getBody2().resetForces();
+   contact.getBody2().setVelocity(0, 0);
+   
+   // Show when/where contact ends in red
+   fill(170, 0, 0);
+   
+ }
+
+void keyPressed() {
+  try {
+    saveFrame("screenshot.png");
+  } 
+  catch (Exception e) {
+  }
+}
+
+
+/**
+ *  Contacts
+ *
+ *  by Ricard Marxer
+ *
+ *  This example shows how to use the contact events.
+ */
+/*
+import fisica.*;
+
+FWorld world;
+FBlob obstacle;
+
+void setup() {
+  size(400, 400);
+  smooth();
+
+  Fisica.init(this);
+  
+  world = new FWorld();
+  world.setGravity(0, 0);
+  
+  obstacle = new FBlob();
+  obstacle.setAsCircle(width/2, height/2, 50);
+
+  obstacle.setRotation(PI/4);
+  obstacle.setPosition(width/2, height/2);
+  //obstacle.setStatic(true);
+  obstacle.setFill(0);
+  obstacle.setRestitution(0);
+  world.add(obstacle);
+}
+FBlob b = null;
+int n = 0;
+void draw() {
+  background(255);
+
+  if (n < 1) {
+    b = new FBlob();
+    b.setAsCircle(width/2, 0, 50);
+    
+    b.setPosition(width/2 + random(-50, 50), 50);
+    b.setVelocity(0, 200);
+    b.setRestitution(0);
+    b.setNoStroke();
+    b.setFill(200, 30, 90);
+    world.add(b);
+    n++;
+    
+  }
+  b.addForce(0, 5);
+  world.draw();
+  world.step();
+  strokeWeight(1);
+  stroke(255);
+  ArrayList contacts = obstacle.getContacts();
+  for (int i=0; i<contacts.size(); i++) {
+    FContact c = (FContact)contacts.get(i);
+    line(c.getBody1().getX(), c.getBody1().getY(), c.getBody2().getX(), c.getBody2().getY());
+    println(c.getBody2().getX());
+  }
+}
+
+void contactStarted(FContact c) 
+{
+  FBody body1 = c.getBody1();
+  FBody body2 = c.getBody2();
+
+  if (body1 == obstacle) 
+  {
+    
+    if (body2 instanceof FBlob) 
+    {
+      FBlob ball = (FBlob) body2;
+      ball.setFill(30, 190, 200);
+      println(ball);
+    }
+  } 
+  else if (body2 == obstacle) 
+  {
+    println("Body2: " + body2 + " Obstacle: " + obstacle);
+    if (body1 instanceof FBlob) 
+    {
+      FBlob ball = (FBlob) body1;
+      ball.setFill(30, 190, 200);
+      println(ball);
+    }
+  }
+}
+FBlob ball = null;
+void contactPersisted(FContact c) {
+  FBody body1 = c.getBody1();
+  FBody body2 = c.getBody2();
+  
+  obstacle.setAsCircle(width/2, height/2);
+  println(obstacle);
+  if (body1.equals(obstacle)) {
+    if (body2 instanceof FBlob) {
+      ball = (FBlob) body2;
+      ball.setFill(30, 120, 200);
+      
+    }
+  } else if (body2.equals(obstacle)) {
+    if (body1 instanceof FBlob) {
+      ball = (FBlob) body1;
+      ball.setFill(30, 120, 200);
+      
+    }
+    
+  }
+  println(ball);
+  noStroke();
+  fill(255, 220, 0);
+  ellipse(c.getX(), c.getY(), 10, 10);
+}
+
+void contactEnded(FContact c) {
+  FBody body1 = c.getBody1();
+  FBody body2 = c.getBody2();
+
+  if (body1 == obstacle) {
+    if (body2 instanceof FBlob) {
+      FBlob ball = (FBlob) body2;
+      ball.setFill(200, 30, 90);
+    }
+  } else if (body2 == obstacle) {
+    if (body1 instanceof FBlob) {
+      FBlob ball = (FBlob) body1;
+      ball.setFill(200, 30, 90);
+    }
+  }
+}
+
+void keyPressed() {
+  try {
+    saveFrame("screenshot.png");
+  } 
+  catch (Exception e) {
+  }
+}
+
+
+
 /*
 class Luca
   Luca l2;

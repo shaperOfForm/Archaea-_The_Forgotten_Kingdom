@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://jaqkl75li05x"]
+
+[ext_resource type="PackedScene" uid="uid://cdg1jr3aw7uto" path="res://luca.tscn" id="1_ppdyk"]
+[ext_resource type="PackedScene" path="res://world_boundary.tscn" id="2_y4lb3"]
+
+[node name="Environment" type="Node2D"]
+
+[node name="luca" parent="." instance=ExtResource("1_ppdyk")]
+position = Vector2(-92, 32)
+
+[node name="World Boundary" parent="." instance=ExtResource("2_y4lb3")]
