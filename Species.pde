@@ -1,4 +1,4 @@
-/*
+
 static class Species
 {
   int[] col = {255, 0, 0};
@@ -216,4 +216,3 @@ static class Species
     this.lifespan_max = lifespan_max;
   }
 }
-*/
