@@ -383,6 +383,11 @@ class Luca
       if(PVector.dist(this.loc, pred.loc) <= pred.cell_w)
       {
         pred.hunger -= 100;
+        // Limit hunger to zero
+        if(pred.hunger < 0)
+        {
+          pred.hunger = 0;
+        }
         return true;
       }
     }

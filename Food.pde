@@ -44,6 +44,11 @@ class Food
       if(PVector.dist(this.loc, luca.loc) < luca.cell_w - this.mass)
       {
         luca.hunger -= 50;
+        // Limit hunger to 0
+        if(luca.hunger < 0)
+        {
+          luca.hunger = 0;
+        }
         return true;
       }
     }
