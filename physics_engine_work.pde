@@ -1,46 +1,50 @@
+import java.util.Iterator;
+
+Environment e;
+
+ArrayList<Species> biome;
+
+float time;
+
 void setup()
 {
-  size(500,500);
+  // Set up canvas
+  size(1000,1000, P2D);
   background(255);
   fill(0);
   smooth();
   frameRate(11);
   
-  Luca luca = new Luca();
-  // Spawn first luca
-  luca.spawn();
-}
+  e = new Environment();
 
-int limit = 2;
-Luca child = null;
-
-void draw(){
-  drawBack();
+  biome = new ArrayList<Species>();
   
-  // If there are less lucas than the limit
-  if(limit > 0)
+  Species s = new Species();
+
+  Species predator = new Species(1);
+
+  biome.add(s);
+
+  biome.add(predator);
+  
+}
+// Set luca limit
+int limit = 50;
+
+void draw()
+{
+  // Draw background
+  drawBack();
+
+  e.run();
+
+  Iterator<Species> it = biome.iterator();
+  while(it.hasNext())
   {
-    // Replicate
-    child = all.get(0).split();
-    limit--;
-    child.loc = new PVector(all.get(0).loc.x, all.get(0).loc.y);
+    Species s = it.next();
+    s.run();
   }
-  //If they are not touching
-  if(child != null && dist(all.get(0).loc.x, all.get(0).loc.y, all.get(1).loc.x, all.get(1).loc.y) < all.get(0).cell_w+1)
-  {
-    // Push them apart
-    all.get(0).move(200);
-    child.move(20);
-    println("L2: " + child.loc.x);
-  }
-  else
-  {
-    // Otherwise, move a cell to a point
-    all.get(0).move(new PVector(200, 200));
-  }
-  // Display the lucas
-  drawLuca(all.get(0));
-  drawLuca(child);
+  
 }
 
 
@@ -61,8 +65,4 @@ void keyPressed() {
 void drawBack()
 {
   background(220, 55, 55);
-}
-static void move(Luca l, float deg)
-{
-  l.move(deg);
 }
