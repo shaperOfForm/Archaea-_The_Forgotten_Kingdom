@@ -12,12 +12,11 @@ class Food
 
   Food()
   {
-    this.loc = new PVector(random(width), random(height));
-    this.mass = random(8, 13);
+    this.loc = new PVector(random(5, width-5), random(55, height-5));
+    this.mass = random(7, 12);
     this.G = 0.4;
     //println(food_img.width, food_img.height);
-    this.img_path = "food" + int(random(1, 8)) + ".png";
-    this.food_img = loadImage(img_path);
+    this.food_img = food_imgs[int(random(0, food_imgs.length))];
   }
   
   void drawFood()
@@ -41,9 +40,23 @@ class Food
   {
     for(Luca luca: all)
     {
-      if(PVector.dist(this.loc, luca.loc) < luca.cell_w - this.mass)
+      if(PVector.dist(this.loc, luca.loc) < luca.cell_w - this.mass + 5 && luca.cell_w > this.mass)
       {
-        luca.hunger -= 50;
+        
+        if(luca instanceof Predator)
+        {
+          luca.hunger -= .2*this.mass;
+          luca.stam += .2*this.mass;
+        }
+        else
+        {
+          luca.hunger -= this.mass;
+          luca.stam += this.mass;
+        }
+        /*
+        luca.hunger -= this.mass;
+        luca.stam += this.mass;
+        */
         // Limit hunger to 0
         if(luca.hunger < 0)
         {

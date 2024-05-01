@@ -2,7 +2,7 @@ class Environment
 {
     ArrayList<Food> all_food;
     
-    int limit = 100;
+    int limit = 750;
 
     Environment()
     {
@@ -15,21 +15,26 @@ class Environment
 
     void run()
     {
+        int eaten = 0;
+
         Iterator<Food> itf = all_food.iterator();
-        Food new_food = null;
         while(itf.hasNext())
         {
             Food f = itf.next();
-            f.drawFood();
             if(f.eaten())
             {
                 itf.remove();
-                new_food = new Food();
+                eaten++;
+                f = null;
+            }
+            else
+            {
+                f.drawFood();
             }
         }
-        if(new_food != null)
+        for(int i = 0; i < eaten; i++)
         {
-            all_food.add(new_food);
+            all_food.add(new Food());
         }
     }
 }

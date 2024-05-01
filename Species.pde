@@ -1,46 +1,48 @@
 static int num_species = 0;
+long restStartTime = 0;
+boolean resting = false;
+
+color new_spec_col;
 
 class Species
 {
-  color col = color(random(255), random(255), random(255));
+  color col;
   String diet;
-  float width_min;
-  float width_max;
-  float height_min;
-  float height_max;
-  float rep_rate_min;
-  float rep_rate_max;
-  float top_speed_min;
-  float top_speed_max;
+  float width_avg;
+  float height_avg;
+  float rep_rate_avg;
+  float top_speed_avg;
+  float max_hunger_avg;
+  float max_stam_avg;
+  float split_thresh_avg;
   boolean nucleus = false;
-  float lifespan_min;
-  float lifespan_max;
+  float lifespan_avg;
+  float mut_rate_avg;
   int num_organisms = 0;
   String movement = null;
   boolean gene_flow = false;
-  float speed_min;
-  float speed_max;
   
   float mut_rate = .2;
   
   ArrayList<Luca> all_in_species;
+
+  boolean speciate = false;
   
-  ArrayList<Species> known_species;
 
   Species()
   {
     this.col= color(random(255), random(255), random(255));
+    new_spec_col = col;
     this.diet = "Filter";
-    this.width_min = 10;
-    this.width_max = 20;
-    this.height_min = 10;
-    this.height_max = 20;
-    this.rep_rate_min = 5;
-    this.rep_rate_max = 15;
-    this.speed_min = .8;
-    this.speed_max = 1.2;
-    this.lifespan_min = 15;
-    this.lifespan_max = 30;
+    this.width_avg = 20;
+    this.height_avg = 20;
+    this.rep_rate_avg = 15;
+    this.top_speed_avg = 1.2;
+    this.lifespan_avg = 30;
+    this.max_hunger_avg = 100;
+    this.max_stam_avg = 100;
+    this.split_thresh_avg = 50;
+    this.mut_rate_avg = .2;
     this.nucleus = false;
     this.movement = null;
     this.gene_flow = false;
@@ -56,20 +58,17 @@ class Species
   Species(int n)
   {
     this.col= color(random(255), random(255), random(255));
+    new_spec_col = col;
     this.diet = "Filter";
-    this.width_min = 10;
-    this.width_max = 20;
-    this.height_min = 10;
-    this.height_max = 20;
-    this.rep_rate_min = 5;
-    this.rep_rate_max = 15;
-    this.speed_min = .8;
-    this.speed_max = 1.2;
-    this.lifespan_min = 15;
-    this.lifespan_max = 30;
-    this.nucleus = false;
-    this.movement = null;
-    this.gene_flow = false;
+    this.width_avg = 10;
+    this.height_avg = 10;
+    this.rep_rate_avg = 5;
+    this.top_speed_avg = .8;
+    this.lifespan_avg = 15;
+    this.max_hunger_avg = 50;
+    this.max_stam_avg = 50;
+    this.split_thresh_avg = 25;
+    this.mut_rate_avg = .2;
     this.all_in_species = new ArrayList<Luca>();
     // Create initial luca
     Luca predator = new Predator();
@@ -77,58 +76,44 @@ class Species
     this.all_in_species.add(predator);
     // Spawn first luca
     predator.spawn();
-    predator.loc = new PVector(300, 300);
+    predator.loc = new PVector(100, 100);
   }
   
-  Species(
-  color col, 
-  String diet, 
-  float width_min, 
-  float width_max,
-  float height_min, 
-  float height_max,
-  float rep_rate_min, 
-  float rep_rate_max, 
-  float speed_min, 
-  float speed_max,
-  float lifespan_min,
-  float lifespan_max,
-  boolean nucleus,
-  String movement,
-  boolean gene_flow
-  )
+  Species(Luca l)
   {
-    this.col = color(random(255), random(255), random(255));
-    this.diet = diet;
-    this.width_min = width_min;
-    this.width_max = width_max;
-    this.height_min = height_min;
-    this.height_max = height_max;
-    this.rep_rate_min = rep_rate_min;
-    this.rep_rate_max = rep_rate_max;
-    this.speed_min = speed_min;
-    this.speed_max = speed_max;
-    this.lifespan_min = lifespan_min;
-    this.lifespan_max = lifespan_max;
-    this.nucleus = nucleus;
-    this.movement = movement;
-    this.gene_flow = gene_flow;
-    known_species.add(this);
-    num_species++;
+    this.col= color(random(255), random(255), random(255));
+    new_spec_col = col;
+    this.diet = l.diet;
+    this.width_avg = l.cell_w;
+    this.height_avg = l.cell_h;
+    this.rep_rate_avg = l.rep_rate;
+    this.top_speed_avg = l.top_speed;
+    this.lifespan_avg = l.lifespan;
+    this.max_hunger_avg = l.max_hunger;
+    this.max_stam_avg = l.max_stam;
+    this.split_thresh_avg = l.split_thresh;
+    this.mut_rate_avg = l.mut_rate;
+    this.all_in_species = new ArrayList<Luca>();
+    
+    l.spec.all_in_species.remove(l);
+    l.spec = this;
+    this.all_in_species.add(l);
   }
 
   void run()
   {
-    Luca new_luca = null;
-    
+    ArrayList<Luca> new_lucas = new ArrayList<Luca>();
+
     // First loop: Update state of all Luca instances
-    for(Luca l : all_in_species)
+    for(Luca l : this.all_in_species)
     {
       // Detect contact constantly
       l.detectContact();
+      l.checkEdges();
 
-      l.lifespan--;
-      l.hunger++;
+      l.life_remaining--;
+      l.hunger += .5;
+      l.rep_prog++;
       //l.timex += .01;
       //l.timey += .01;
 
@@ -136,26 +121,63 @@ class Species
       l.applyForce(l.fric);
 
       PVector gravity = new PVector(0, 0, -0.1*l.mass);
-      l.applyForce(gravity);
+      //l.applyForce(gravity);
       // Move to its destination
 
       // Increase stamina constantly
-      l.stam++;
+      //l.stam++;
+      l.stam = constrain(l.stam, 0.0, l.max_stam);
 
       // If there are less lucas than the limit
-      if(all.size() <= limit && l.stam > 100 && l.hunger < 50)
+      if(all.size() < limit && l.stam > l.split_thresh && l.hunger < (l.max_hunger * .5) && l.life_remaining < l.lifespan - 20 && l.rep_prog >= l.rep_rate)
       {
         // Replicate
-        new_luca = l.split();
+        Luca new_luca = l.split();
+        new_lucas.add(new_luca);
+        speciate = true;
       }
-      if(l instanceof Predator)
+    }
+    if(new_lucas.size() > 0)
+    {
+      for(Luca l : new_lucas)
       {
-        ((Predator)l).applyBehaviors();
+        all.add(l);
+        this.all_in_species.add(l);
+      }
+    }
+    
+    for(Luca l : this.all_in_species)
+    {
+      if(true)
+      //if(l.stam > 0 && !resting)
+      {
+        if(l instanceof Predator)
+        {
+          ((Predator)l).applyBehaviors();
+          //print(((Predator)l).closest_prey);
+        }
+        else
+        {
+          l.applyBehaviors();
+        }
       }
       else
       {
-        l.applyBehaviors();
+        if(!resting)
+        {
+          resting = true;
+          restStartTime = millis();
+        }
+        else if(millis() - restStartTime > 10000)
+        {
+          resting = false;
+        }
+        else
+        {
+          l.vel = new PVector(0, 0);
+        }
       }
+      /*
       // If there is no contact
       if(l.contacts.size() == 0)
       {
@@ -166,6 +188,7 @@ class Species
           l.setDest(new PVector(random(width), random(height)));
         }
       }
+      */
       l.move();
       //all.get(i).move();
       // Display the luca
@@ -180,7 +203,7 @@ class Species
     while(it.hasNext())
     {
       Luca l = it.next();
-      if(l.hunger >= 150 || l.lifespan <= 0 || (!(l instanceof Predator) && l.eaten()))
+      if(l.hunger >= l.max_hunger || l.life_remaining <= 0 || (!(l instanceof Predator) && l.eaten()))
       {
         it.remove();
         if(l instanceof Predator)
@@ -195,11 +218,14 @@ class Species
         l = null;
       }
     }
-
-    if(new_luca != null)
-    {
-      all.add(new_luca);
-      this.all_in_species.add(new_luca);
-    }
+  }
+  void speciate(Luca l)
+  {
+    // Create a new species
+    Species new_spec = new Species(l);
+    // Add the new species to the list of known species
+    new_species.add(new_spec);
+    // Increment the number of species
+    //num_species++;
   }
 }
