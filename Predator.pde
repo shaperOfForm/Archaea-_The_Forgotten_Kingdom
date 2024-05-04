@@ -6,25 +6,16 @@ class Predator extends Luca
     
     Luca closest_prey;
     String img_path;
-    
-    float max_hunger;
-    float split_thresh;
-    float lifespan;
 
     float fitness;
 
     int prey_eaten;
 
-    DNA dna;
-
     Predator()
     {
         super();
         
-        this.dna = new DNA();
-        
         this.cell_w = map(dna.genes[1], 0, 1, 10, 70); // 25
-        this.max_force = 999999999;
 
         // PLAY WITH TOP SPEED NEXT!!!!!!!
         // Then read the textbook 
@@ -47,7 +38,18 @@ class Predator extends Luca
     {
         super(x, y, parent);
         this.stam = 0;
-        all_predators.add(this);
+        if(this instanceof Predator)
+        {
+            this.top_speed = map(dna.genes[0], 0, 1, 20, 40);
+            this.cell_w = map(dna.genes[1], 0, 1, 15, 20); // 15
+            this.rep_rate = map(dna.genes[2], 0, 1, 20, 30); // 25
+            this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
+            this.mut_rate = map(dna.genes[7], 0, 1, .5, .75); //.25
+            this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
+            this.max_stam = map(dna.genes[5], 0, 1, 36, 55); // 150
+            this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
+            all_predators.add(this);
+        }
     }
 
     @Override

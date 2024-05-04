@@ -87,16 +87,22 @@ class Luca
 
     this.dna = new DNA();
 
-    this.top_speed = map(dna.genes[0], 0, 1, 20, 40);
+    
     this.max_force = 999999999;
     
     // If the luca's go in circles around food, increase max_force
 
     this.stam = random(0, 5);
+    this.top_speed = map(dna.genes[0], 0, 1, 20, 40);
     this.cell_w = map(dna.genes[1], 0, 1, 15, 20); // 15
+    this.rep_rate = map(dna.genes[2], 0, 1, 20, 30); // 25
+    this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
+    this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
+    this.max_stam = map(dna.genes[5], 0, 1, 35, 55); // 150
+    this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
+    this.mut_rate = map(dna.genes[7], 0, 1, .5, .75); //.25
     this.cell_h = 15;
     this.mass = 64656.70908252886 / (this.cell_w/2 * this.cell_w/2 * this.cell_w/2);
-    this.rep_rate = map(dna.genes[2], 0, 1, 20, 30); // 25
     this.parent = null;
     this.children = new ArrayList<Luca>();
     //this.dest = null;
@@ -105,21 +111,16 @@ class Luca
     this.spec = null;
     this.contacts = new ArrayList<Luca>();
     this.closest_food = null;
-    this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
     this.life_remaining = lifespan;
     this.hunger = 0;
     //this.can_seek = true;
     this.timex = random(1000);
     this.timey = random(1000);
-    this.mut_rate = map(dna.genes[7], 0, 1, .5, .75); //.25
     //this.wanderTheta = random(0, 2*PI);
     if(!(this instanceof Predator))
     {
       all_prey.add(this);
     }
-    this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
-    this.max_stam = map(dna.genes[5], 0, 1, 35, 55); // 150
-    this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
     this.rep_prog = 0;
     this.col = new_spec_col;
   }
@@ -136,15 +137,18 @@ class Luca
     this.dna = parent.dna.copy();
     this.mut_rate = parent.mut_rate;
     this.mutate();
-    this.top_speed = map(dna.genes[0], 0, 1, 20, 40);
-    this.cell_w = map(dna.genes[1], 0, 1, 15, 20); // 15
-    this.rep_rate = map(dna.genes[2], 0, 1, 20, 30); // 25
-    this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
-    this.mut_rate = map(dna.genes[7], 0, 1, .5, .75); //.25
-    this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
-    this.max_stam = map(dna.genes[5], 0, 1, 36, 55); // 150
-    this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
-    this.rep_prog = random(0, 3);
+    if(!(this instanceof Predator))
+    {
+      this.top_speed = map(dna.genes[0], 0, 1, 20, 40);
+      this.cell_w = map(dna.genes[1], 0, 1, 15, 20); // 15
+      this.rep_rate = map(dna.genes[2], 0, 1, 20, 30); // 25
+      this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
+      this.mut_rate = map(dna.genes[7], 0, 1, .5, .75); //.25
+      this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
+      this.max_stam = map(dna.genes[5], 0, 1, 36, 55); // 150
+      this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
+      this.rep_prog = random(0, 3);
+    }
   }
 
   void mutate()
