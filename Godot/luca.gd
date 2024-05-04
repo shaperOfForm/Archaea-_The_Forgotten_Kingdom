@@ -102,4 +102,4 @@ func _on_body_entered(otherBody:Node):
 		# set impulse
 		#self.apply_impulse(self.global_position, direction.normalized() * speed)
 	elif otherBody.name == "World Boundary":
-		self.linear_velocity = self.linear_velocity * 0
+		self.linear_velocity = Vector2(0, 0)

@@ -2,7 +2,7 @@ class Environment
 {
     ArrayList<Food> all_food;
     
-    int limit = 1000;
+    int limit = 1200;
 
     Environment()
     {

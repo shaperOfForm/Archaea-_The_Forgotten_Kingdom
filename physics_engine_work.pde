@@ -99,7 +99,7 @@ void setup()
   {
     if(all_predators.size() > 0)
     {
-      println("PREDATOR: " + all_predators.get(0).stam);
+      //println("PREDATOR: " + all_predators.get(0).stam);
     }
 
     for(int i = 0; i < cols; i++)
@@ -150,7 +150,6 @@ void setup()
   {
     if(mousePressed && mouseX >= 50.5*width/100 && mouseX <= 50.5*width/100 + 150 && mouseY >= 3 && mouseY <= 52)
     {
-      println(2);
       // Check step method to see what to change
       step();
       redraw();
@@ -198,7 +197,6 @@ void stepForButton()
   //loop();
   f_rate = 11;
   frameRate(11);
-  println(1);
   if(isPaused)
   {
     loop();
@@ -401,7 +399,6 @@ void drawPanel()
 {
   if(!about)
   {
-    println("About NOW: " + about);
     fill(200, 200);
     rect(0, 0, width, 50);
     // Add play button to panel

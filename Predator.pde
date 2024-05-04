@@ -11,42 +11,51 @@ class Predator extends Luca
     float split_thresh;
     float lifespan;
 
+    float fitness;
+
+    int prey_eaten;
+
+    DNA dna;
+
     Predator()
     {
         super();
-        this.cell_w = 25;
+        
+        this.dna = new DNA();
+        
+        this.cell_w = map(dna.genes[1], 0, 1, 10, 70); // 25
         this.max_force = 999999999;
 
         // PLAY WITH TOP SPEED NEXT!!!!!!!
         // Then read the textbook 
         // Adjust UML and Components
-        
-        this.top_speed = 13;
+        this.top_speed = map(dna.genes[0], 0, 1, 20, 25); // 13
         Luca closest_prey = null;
-        this.stam = 10;
-        this.rep_prog = 20;
-        this.rep_rate = 30;
-        this.max_hunger = 500;
-        this.split_thresh = 20;
-        this.lifespan = 400;
+        this.rep_prog = random(4, 9);
+        this.rep_rate = map(dna.genes[2], 0, 1, 10, 15); // 30
+        this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
+        this.max_stam = map(dna.genes[5], 0, 1, 35, 55); // 150
+        this.split_thresh = map(dna.genes[6], 0, 1, 15, 25); //20;
+        this.lifespan = map(dna.genes[3], 0, 1, 200, 400); // 400
         this.life_remaining = this.lifespan;
+        all_predators.add(this);
+        this.stam = 14;
+        this.hunger = 0;
+        this.prey_eaten = 0;
+    }
+    Predator(float x, float y, Predator parent)
+    {
+        super(x, y, parent);
+        this.stam = 0;
         all_predators.add(this);
     }
-    Predator(float x, float y, float cell_w, float top_speed, float rep_rate, float max_force, float max_hunger, float max_stam, float split_thresh, float lifespan)
+
+    @Override
+    void fitness()
     {
-        this();
-        this.cell_w = cell_w + random(-1, 1);
-        this.max_force = max_force + random(-mut_range, mut_range);
-        this.top_speed = top_speed + random(-1, 1);
-        Luca closest_prey = null;
-        this.stam = 0;
-        this.rep_rate = rep_rate + random(-1, 1);
-        this.rep_prog = random(0, 5);
-        this.max_hunger = max_hunger + random(-mut_range, mut_range);
-        this.split_thresh = split_thresh + random(-mut_range, mut_range);
-        this.lifespan = lifespan + random(-mut_range, mut_range);
-        this.life_remaining = this.lifespan;
-        all_predators.add(this);
+        this.fitness += pow((this.prey_eaten), 2);
+        this.fitness += pow((.05*this.food_eaten), 2);
+        this.fitness += pow(this.children.size(), 2);
     }
 
     void drawLuca()
@@ -84,7 +93,7 @@ class Predator extends Luca
         force = PVector.sub(this.loc, l.loc);
         //float dist = dir.magSq();
         float dist = force.mag();
-        dist = constrain(dist, 5, 1000);
+        dist = constrain(dist, 4, 1000);
         force.normalize();
         float force_mag = -1;
         if(dist != 0)
@@ -161,7 +170,7 @@ class Predator extends Luca
         if(force != null /*&& this.can_seek*/ && (force.x != 0 && force.y != 0))
         {
             //seekForce.setMag(50000);
-            force.mult(10);
+            force.mult(12);
             //seekForce.limit(25*this.top_speed);
             this.applyForce(force);
         }
@@ -174,7 +183,7 @@ class Predator extends Luca
         if(force != null /*&& this.can_seek*/ && (force.x != 0 && force.y != 0))
         {
             //seekForce.setMag(50000);
-            force.mult(6);
+            force.mult(8);
             //seekForce.limit(15*this.top_speed);
             this.applyForce(force);
         }

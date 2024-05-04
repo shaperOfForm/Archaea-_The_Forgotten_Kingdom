@@ -68,8 +68,14 @@ class Luca
   float rep_prog;
 
   float mut_range = 5;
+
+  float fitness;
+
+  float food_eaten;
   
   color col;
+
+  DNA dna;
 
   // Default constructor
   Luca()
@@ -78,16 +84,19 @@ class Luca
     this.loc = new PVector(width - 100, height - 100);
     this.vel = new PVector(0, 0);
     this.acc = new PVector(0, 0);
-    this.top_speed = 32;
+
+    this.dna = new DNA();
+
+    this.top_speed = map(dna.genes[0], 0, 1, 20, 40);
     this.max_force = 999999999;
     
     // If the luca's go in circles around food, increase max_force
 
     this.stam = random(0, 5);
-    this.cell_w = 15;
+    this.cell_w = map(dna.genes[1], 0, 1, 15, 20); // 15
     this.cell_h = 15;
     this.mass = 64656.70908252886 / (this.cell_w/2 * this.cell_w/2 * this.cell_w/2);
-    this.rep_rate = 25;
+    this.rep_rate = map(dna.genes[2], 0, 1, 20, 30); // 25
     this.parent = null;
     this.children = new ArrayList<Luca>();
     //this.dest = null;
@@ -96,69 +105,70 @@ class Luca
     this.spec = null;
     this.contacts = new ArrayList<Luca>();
     this.closest_food = null;
-    this.lifespan = 150;
+    this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
     this.life_remaining = lifespan;
     this.hunger = 0;
     //this.can_seek = true;
     this.timex = random(1000);
     this.timey = random(1000);
-    this.mut_rate = .25;
+    this.mut_rate = map(dna.genes[7], 0, 1, .5, .75); //.25
     //this.wanderTheta = random(0, 2*PI);
     if(!(this instanceof Predator))
     {
       all_prey.add(this);
     }
-    this.max_hunger = 500;
-    this.max_stam = 150;
-    this.split_thresh = 30;
+    this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
+    this.max_stam = map(dna.genes[5], 0, 1, 35, 55); // 150
+    this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
     this.rep_prog = 0;
     this.col = new_spec_col;
   }
   // Constructor with parameters
-  Luca(float x, float y, float cell_w, float top_speed, float rep_rate, float max_force, float max_hunger, float max_stam, float split_thresh, float lifespan)
+  Luca(float x, float y, Luca parent)
   {
-    super();
+    this();
+    this.stam = 0;
     this.loc = new PVector(x, y);
-    this.vel = new PVector(0, 0);
-    this.acc = new PVector(0, 0);
-    this.top_speed = top_speed + random(-1, 1);
-    this.max_force = max_force + random(-mut_range, mut_range);
-    this.stam = random(0, 5);
-    this.cell_w = cell_w + random(-2, 2);
-    this.cell_h = cell_h + random(-1, 1);
-    this.mass = 64656.70908252886 / (this.cell_w/2 * this.cell_w/2 * this.cell_w/2);
-    this.rep_rate = rep_rate + random(-1, 1);
-    this.parent = null;
-    this.children = new ArrayList<Luca>();
-    //this.dest = null;
-    this.xCoor = new ArrayList<Float>();
-    this.yCoor = new ArrayList<Float>();
-    this.spec = null;
-    this.contacts = new ArrayList<Luca>();
-    this.closest_food = null;
-    this.lifespan = lifespan + random(-mut_range, mut_range);
-    this.life_remaining = lifespan;
-    this.hunger = 0;
-    //this.can_seek = true;
-    this.timex = random(1000);
-    this.timey = random(1000);
-    this.mut_rate = .25 + random(-.1, .1);
-    this.wanderTheta = random(0, 2*PI+1);
-    if(!(this instanceof Predator))
+    this.parent = parent;
+    parent.children.add(this);
+    this.spec = parent.spec;
+    this.col = parent.col;
+    this.dna = parent.dna.copy();
+    this.mut_rate = parent.mut_rate;
+    this.mutate();
+    this.top_speed = map(dna.genes[0], 0, 1, 20, 40);
+    this.cell_w = map(dna.genes[1], 0, 1, 15, 20); // 15
+    this.rep_rate = map(dna.genes[2], 0, 1, 20, 30); // 25
+    this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
+    this.mut_rate = map(dna.genes[7], 0, 1, .5, .75); //.25
+    this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
+    this.max_stam = map(dna.genes[5], 0, 1, 36, 55); // 150
+    this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
+    this.rep_prog = random(0, 3);
+  }
+
+  void mutate()
+  {
+    for(int i = 0; i < this.dna.genes.length; i++)
     {
-      all_prey.add(this);
+      if(random(1) < this.mut_rate)
+      {
+        this.dna.genes[i] = this.dna.genes[i] + random(-9, 9);
+        this.dna.genes[i] = constrain(this.dna.genes[i], 0, 1);
+      }
     }
-    this.max_hunger = max_hunger + random(-mut_range, mut_range);
-    this.max_stam = max_stam + random(-mut_range, mut_range);
-    this.split_thresh = split_thresh + random(-mut_range, mut_range);
-    this.rep_prog = 0;
-    this.col = new_spec_col;
   }
 
   void applyRepeller(Predator p)
   {
     force = p.repel(this);
     this.applyForce(force);
+  }
+  
+  void fitness()
+  {
+    this.fitness += pow((.25*this.food_eaten), 2);
+    this.fitness += pow(this.children.size(), 2);
   }
   
   /*
@@ -276,9 +286,9 @@ PVector[] flock()
   PVector ali = align();
   PVector coh = cohesion();
 
-  sep.mult(1.5);
+  sep.mult(2.0);
   ali.mult(1.0);
-  coh.mult(1.0);
+  coh.mult(1.5);
 
   return new PVector[]{sep, ali, coh};
 }
@@ -640,15 +650,12 @@ PVector wallForce()
     Luca l2 = null;
     if(l instanceof Predator)
     {
-      l2 = new Predator(l.loc.x, l.loc.y, l.cell_w, l.top_speed, l.rep_rate, l.max_force, l.max_hunger, l.max_stam, l.split_thresh, l.lifespan);
+      l2 = new Predator(l.loc.x, l.loc.y, (Predator)l);
     }
     else
     {
-      l2 = new Luca(l.loc.x, l.loc.y, l.cell_w, l.top_speed, l.rep_rate, l.max_force, l.max_hunger, l.max_stam, l.split_thresh, l.lifespan);
+      l2 = new Luca(l.loc.x, l.loc.y, l);
     }
-    
-    l2.parent = l;
-    l.children.add(l2);
     
     return l2;
   }
@@ -656,12 +663,12 @@ PVector wallForce()
   // Split one Luca into two
   Luca split()
   {
-    // Spawn new luca on top of original
-    Luca l2 = this.spawn(this);
-
     this.stam *= random(0, .2);
     this.hunger += random(15, 25);
-    this.rep_prog *= random(0, .2);
+    this.rep_prog = random(0, 3);
+    // Spawn new luca on top of original
+    Luca l2 = this.spawn(this);
+    // If the luca's fitness is higher than a random value
 
     l2.loc = new PVector(this.loc.x, this.loc.y);
 
@@ -695,6 +702,7 @@ PVector wallForce()
         {
           pred.hunger -= this.cell_w;
           pred.stam += this.cell_w;
+          ((Predator)pred).prey_eaten++;
           // Limit hunger to zero
           constrain(pred.hunger, 0, pred.max_hunger);
           return true;

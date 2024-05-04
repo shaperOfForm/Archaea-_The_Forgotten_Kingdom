@@ -2,5 +2,5 @@ res://luca.tscn
 res://luca.gdshader
 res://environment.tscn
 res://world_boundary.tscn
-res://luca.gd
 res://LucaManager.gd
+res://luca.gd

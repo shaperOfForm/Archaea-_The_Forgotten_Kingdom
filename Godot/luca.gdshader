@@ -31,11 +31,8 @@ void fragment() {
 	// Apply color to current fragment
 	COLOR = mix(distortedColor, overlayColor, 0.1);
 	
-	// Calculate distance and angle for the current fragment to center
-	float dist = length(distToCenter);
-	
 	// The further a fragment is from the center, the more red it will appear
-	COLOR[0] = dist; // red border
+	COLOR[0] = distToCenter; // red border
 	
 	//COLOR[3] = COLOR[3] * alpha;
 }

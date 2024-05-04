@@ -42,14 +42,15 @@ class Food
         
         if(luca instanceof Predator)
         {
-          luca.hunger -= .4*this.mass;
-          luca.stam += .4*this.mass;
+          luca.hunger -= .5*this.mass;
+          luca.stam += .5*this.mass;
         }
         else
         {
           luca.hunger -= this.mass;
           luca.stam += this.mass;
         }
+        luca.food_eaten++;
         /*
         luca.hunger -= this.mass;
         luca.stam += this.mass;

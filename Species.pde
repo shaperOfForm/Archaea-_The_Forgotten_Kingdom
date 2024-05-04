@@ -38,7 +38,7 @@ class Species
     this.max_hunger_avg = 100;
     this.max_stam_avg = 100;
     this.split_thresh_avg = 50;
-    this.mut_rate_avg = .2;
+    this.mut_rate_avg = .75;
     //this.gene_flow = false;
     this.all_in_species = new ArrayList<Luca>();
     // Create initial luca
@@ -97,6 +97,13 @@ class Species
     // First loop: Update state of all Luca instances
     for(Luca l : this.all_in_species)
     {
+      l.fitness();
+
+      if(all_predators.get(0) != null)
+      {
+        //println(all_predators.get(0).fitness);
+      }
+
       // Detect contact constantly
       l.detectContact();
       l.checkEdges();
@@ -125,6 +132,7 @@ class Species
         Luca new_luca = l.split();
         new_lucas.add(new_luca);
         speciate = true;
+        l.rep_prog = 0;
       }
     }
     if(new_lucas.size() > 0)
