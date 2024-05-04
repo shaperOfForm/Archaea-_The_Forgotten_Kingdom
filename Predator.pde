@@ -16,24 +16,32 @@ class Predator extends Luca
         super();
         this.cell_w = 25;
         this.max_force = 999999999;
-        this.top_speed = 10;
+
+        // PLAY WITH TOP SPEED NEXT!!!!!!!
+        // Then read the textbook 
+        // Adjust UML and Components
+        
+        this.top_speed = 13;
         Luca closest_prey = null;
-        this.stam = 0;
-        this.rep_rate = 50;
-        this.max_hunger = 150;
+        this.stam = 10;
+        this.rep_prog = 20;
+        this.rep_rate = 30;
+        this.max_hunger = 500;
         this.split_thresh = 20;
-        this.lifespan = 250;
+        this.lifespan = 400;
+        this.life_remaining = this.lifespan;
         all_predators.add(this);
     }
-    Predator(float x, float y, float cell_w, float cell_h, int species_num, float top_speed, float rep_rate, float max_force, float max_hunger, float max_stam, float split_thresh, float lifespan)
+    Predator(float x, float y, float cell_w, float top_speed, float rep_rate, float max_force, float max_hunger, float max_stam, float split_thresh, float lifespan)
     {
-        super(x, y, cell_w, cell_h, species_num, top_speed, rep_rate, max_force, max_hunger, max_stam, split_thresh, lifespan);
+        this();
         this.cell_w = cell_w + random(-1, 1);
         this.max_force = max_force + random(-mut_range, mut_range);
         this.top_speed = top_speed + random(-1, 1);
         Luca closest_prey = null;
         this.stam = 0;
         this.rep_rate = rep_rate + random(-1, 1);
+        this.rep_prog = random(0, 5);
         this.max_hunger = max_hunger + random(-mut_range, mut_range);
         this.split_thresh = split_thresh + random(-mut_range, mut_range);
         this.lifespan = lifespan + random(-mut_range, mut_range);
@@ -150,7 +158,7 @@ class Predator extends Luca
         // Seek prey
         force = this.seekClosestPrey();
         //println("SEEK FORC: " + seekForce);
-        if(force != null && this.can_seek && (force.x != 0 && force.y != 0))
+        if(force != null /*&& this.can_seek*/ && (force.x != 0 && force.y != 0))
         {
             //seekForce.setMag(50000);
             force.mult(10);
@@ -163,10 +171,10 @@ class Predator extends Luca
         }
         // Seek food
         force = this.seekClosest();
-        if(force != null && this.can_seek && (force.x != 0 && force.y != 0))
+        if(force != null /*&& this.can_seek*/ && (force.x != 0 && force.y != 0))
         {
             //seekForce.setMag(50000);
-            force.mult(4);
+            force.mult(6);
             //seekForce.limit(15*this.top_speed);
             this.applyForce(force);
         }

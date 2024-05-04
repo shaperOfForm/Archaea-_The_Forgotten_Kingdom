@@ -1,6 +1,4 @@
 // A class to create Luca objects (cells) and provide all of its functionality
-static int id_count = 0;
-static ArrayList<Luca> all = new ArrayList<Luca>();
 
 PVector force = new PVector();
 PVector sum;
@@ -8,7 +6,6 @@ PVector sum;
 class Luca
 {
   // Attributes
-  float size;
   float max_stam;
   String diet;
   float cell_w;
@@ -19,7 +16,6 @@ class Luca
   float speed;
   float stam;
   float rep_rate;
-  int species_num;
   int id;
   boolean can_move = true;
   float mass;
@@ -36,8 +32,6 @@ class Luca
 
   ArrayList<Float> xCoor;
   ArrayList<Float> yCoor;
-
-  PVector split_dir;
   
   ArrayList<Luca> contacts;
   
@@ -45,8 +39,6 @@ class Luca
   float c = 0.01;
   float normal = 1;
   float fricMag = c*normal;
-  
-  float split_speed;
 
   Food closest_food;
 
@@ -54,7 +46,7 @@ class Luca
 
   float hunger;
 
-  boolean can_seek;
+  //boolean can_seek;
 
   float timex;
   float timey;
@@ -91,32 +83,27 @@ class Luca
     
     // If the luca's go in circles around food, increase max_force
 
-    this.stam = 0;
+    this.stam = random(0, 5);
     this.cell_w = 15;
     this.cell_h = 15;
     this.mass = 64656.70908252886 / (this.cell_w/2 * this.cell_w/2 * this.cell_w/2);
     this.rep_rate = 25;
-    this.species_num = 0;
     this.parent = null;
     this.children = new ArrayList<Luca>();
-    this.dest = null;
-    this.id = id_count;
-    id_count++;
+    //this.dest = null;
     this.xCoor = new ArrayList<Float>();
     this.yCoor = new ArrayList<Float>();
     this.spec = null;
-    this.split_dir = new PVector(random(-1, 1), random(-1, 1));
-    this.split_dir.normalize().mult(this.split_speed);
     this.contacts = new ArrayList<Luca>();
     this.closest_food = null;
-    this.lifespan = 500;
+    this.lifespan = 150;
     this.life_remaining = lifespan;
     this.hunger = 0;
-    this.can_seek = true;
+    //this.can_seek = true;
     this.timex = random(1000);
     this.timey = random(1000);
     this.mut_rate = .25;
-    this.wanderTheta = random(0, 2*PI);
+    //this.wanderTheta = random(0, 2*PI);
     if(!(this instanceof Predator))
     {
       all_prey.add(this);
@@ -128,7 +115,7 @@ class Luca
     this.col = new_spec_col;
   }
   // Constructor with parameters
-  Luca(float x, float y, float cell_w, float cell_h, int species_num, float top_speed, float rep_rate, float max_force, float max_hunger, float max_stam, float split_thresh, float lifespan)
+  Luca(float x, float y, float cell_w, float top_speed, float rep_rate, float max_force, float max_hunger, float max_stam, float split_thresh, float lifespan)
   {
     super();
     this.loc = new PVector(x, y);
@@ -136,17 +123,14 @@ class Luca
     this.acc = new PVector(0, 0);
     this.top_speed = top_speed + random(-1, 1);
     this.max_force = max_force + random(-mut_range, mut_range);
-    this.stam = 0;
+    this.stam = random(0, 5);
     this.cell_w = cell_w + random(-2, 2);
     this.cell_h = cell_h + random(-1, 1);
     this.mass = 64656.70908252886 / (this.cell_w/2 * this.cell_w/2 * this.cell_w/2);
     this.rep_rate = rep_rate + random(-1, 1);
-    this.species_num = species_num;
     this.parent = null;
     this.children = new ArrayList<Luca>();
-    this.dest = null;
-    this.id = id_count;
-    id_count++;
+    //this.dest = null;
     this.xCoor = new ArrayList<Float>();
     this.yCoor = new ArrayList<Float>();
     this.spec = null;
@@ -155,7 +139,7 @@ class Luca
     this.lifespan = lifespan + random(-mut_range, mut_range);
     this.life_remaining = lifespan;
     this.hunger = 0;
-    this.can_seek = true;
+    //this.can_seek = true;
     this.timex = random(1000);
     this.timey = random(1000);
     this.mut_rate = .25 + random(-.1, .1);
@@ -177,6 +161,7 @@ class Luca
     this.applyForce(force);
   }
   
+  /*
   // Copilot helped with this method
   PVector reynoldsWander()
   {
@@ -201,7 +186,9 @@ class Luca
     steer.limit(.2);
     return steer;
   }
+  */
 
+/*
   // A method to wander in randomly changing directions according to a noise function (Perlin noise) and time, using the map fuction to map the noise value to a range of angles
   PVector wander()
   {    
@@ -215,23 +202,34 @@ class Luca
 
     return force;
   }
+*/
 
   // The wander method that instead applys a force to the Luca
 
   void applyBehaviors()
   {
-
-    // Separate
-    force = this.separate();
-    if(this.contacts.size() > 0)
+    // Flock
+    int i = (int)(this.loc.x / this.cell_w);
+    int j = (int)(this.loc.y / this.cell_w);
+    i = min(i, grid.length - 1);
+    j = min(j, grid[0].length - 1);
+    
+    ArrayList<Luca> temp = grid[i][j];
+    for(Luca l2: temp)
     {
-      force.mult(5);
-      this.applyForce(force);
+      if(this != l2)
+      {
+        for(int k = 0; k < 3; k++)
+        {
+          force = this.flock()[k];
+          force.mult(2);
+          this.applyForce(force);
+        }
+      }
     }
-
     // Seek food
     force = this.seekClosest();
-    if(force != null && this.can_seek && (force.x != 0 && force.y != 0))
+    if(force != null /*&& this.can_seek*/ && (force.x != 0 && force.y != 0))
     {
         force.mult(15);
         this.applyForce(force);
@@ -262,13 +260,92 @@ class Luca
     }
   }
 
+  PVector seek(PVector target)
+  {
+    force = PVector.sub(target, this.loc);
+    force.normalize();
+    force.mult(this.top_speed);
+    force.sub(this.vel);
+    force.limit(this.max_force);
+    return force;
+  }
+
+PVector[] flock()
+{
+  PVector sep = separate();
+  PVector ali = align();
+  PVector coh = cohesion();
+
+  sep.mult(1.5);
+  ali.mult(1.0);
+  coh.mult(1.0);
+
+  return new PVector[]{sep, ali, coh};
+}
+
+PVector cohesion()
+{
+  float neighborDist = 50;
+  sum = new PVector(0, 0);
+  int count = 0;
+  for(Luca l: all_prey)
+  {
+    float d = PVector.dist(this.loc, l.loc);
+    if((d > 0) && (d < neighborDist))
+    {
+      sum.add(l.loc);
+      count++;
+    }
+  }
+  if(count > 0)
+  {
+    sum.div(count);
+    return this.seek(sum);
+  }
+  else
+  {
+    return new PVector(0, 0);
+  }
+}
+
+PVector align()
+{
+  float neighborDist = 50; // Make range attribute
+
+  sum = new PVector(0, 0);
+  int count = 0;
+  for(Luca l: all_prey)
+  {
+    float d = PVector.dist(this.loc, l.loc);
+    if((d > 0) && (d < neighborDist))
+    {
+      sum.add(l.vel);
+      count++;
+    }
+  }
+  if(count > 0)
+  {
+    sum.div(count);
+    sum.normalize();
+    sum.mult(this.top_speed);
+
+    force = sum.sub(this.vel);
+    force.limit(this.max_force);
+    return force;
+  }
+  else
+  {
+    return new PVector(0, 0);
+  }
+}
+
 PVector wallForce()
 {
   float margin = 100; // Distance from the edges of the screen
 
   force = new PVector(0, 0);
 
-  count = 0;
+  int count = 0;
 
   if(this.loc.x > width - margin)
   {
@@ -330,7 +407,7 @@ PVector wallForce()
       force.normalize();
       force.mult(this.top_speed);
       force.sub(this.vel);
-      force.limit(3*this.max_force*this.mass);
+      force.limit(4*this.max_force*this.mass);
       return force;
     }
     else
@@ -390,48 +467,44 @@ PVector wallForce()
   // Display the luca
   void drawLuca()
   {
-    noFill();
     beginShape();
     stroke(0, 0, 0);
     fill(this.spec.col);
-    if(this.id == 0)
-    {
-      fill(this.spec.col);
-    }
     if(!isPaused)
     {
-    for (float i = 0; i < TWO_PI; i = i + 0.2)
-    {
-      int index = int(degrees(i)) % 360;
-      // Create edge of circle using sine and cosine
-      float x1 = sin_values[index] * this.cell_w;
-      float y1 = cos_values[index] * this.cell_w;
-/*
-      // Map the relative position of the vertex within the shape to the exact range of the image dimensions
-            float u = map(x1, -1.2*this.cell_w, 1.2*this.cell_w, 0, this.cell_w);
-            float v = map(y1, -1.2*this.cell_w, 1.2*this.cell_w, 0, this.cell_w-0); // Use height instead of width
+      for (float i = 0; i < TWO_PI; i = i + 0.2)
+      {
+        int index = int(degrees(i)) % 360;
+        // Create edge of circle using sine and cosine
+        float x1 = sin_values[index] * this.cell_w;
+        float y1 = cos_values[index] * this.cell_w;
+  /*
+        // Map the relative position of the vertex within the shape to the exact range of the image dimensions
+              float u = map(x1, -1.2*this.cell_w, 1.2*this.cell_w, 0, this.cell_w);
+              float v = map(y1, -1.2*this.cell_w, 1.2*this.cell_w, 0, this.cell_w-0); // Use height instead of width
 
-            // Add noise to the texture coordinates
-            u += sin(u * 0.001) * 100; // Scale down the value passed into the noise function
-            v += sin(v * 0.001) * 100; // Scale down the value passed into the noise function
-*/
-      // Get a random offset
-      float xOffset = random(-1.25, 1.25);
-      float yOffset = random(-1.25, 1.25);
+              // Add noise to the texture coordinates
+              u += sin(u * 0.001) * 100; // Scale down the value passed into the noise function
+              v += sin(v * 0.001) * 100; // Scale down the value passed into the noise function
+  */
+        // Get a random offset
+        float xOffset = random(-1.25, 1.25);
+        float yOffset = random(-1.25, 1.25);
 
-      // Add the offset to the edge coordinates
-      x1 += this.loc.x + xOffset;
-      y1 += this.loc.y + yOffset;
+        // Add the offset to the edge coordinates
+        x1 += this.loc.x + xOffset;
+        y1 += this.loc.y + yOffset;
 
-      // Create a curved line between the vertices
-      curveVertex(x1, y1);
-    }
+        // Create a curved line between the vertices
+        curveVertex(x1, y1);
+      }
     endShape(CLOSE);
     }
-    stroke(this.spec.col);
+    //stroke(this.spec.col);
     //ellipse(0,0,radius*2,radius*2);
   }
 
+  /*
   // The switch-case for mutations
   void mutate(String mutation)
   {
@@ -473,41 +546,57 @@ PVector wallForce()
       this.mutate("can_seek");
     }
   }
+  */
 
   // Method to detect if a luca is making contact with another luca
   // Returns the luca it is making contact with
   Luca detectContact()
   {
+    ArrayList<Luca> temp = new ArrayList<Luca>();
+    if(this instanceof Predator)
+    {
+      temp = (ArrayList<Luca>)all_predators.clone();
+    }
+    else
+    {
+      int i = (int)(this.loc.x / this.cell_w);
+      int j = (int)(this.loc.y / this.cell_w);
+      // Apply forces only to Luca objects in the same cell
+      i = min(i, grid.length - 1);
+      j = min(j, grid[0].length - 1);
+
+      temp = grid[i][j];
+    }
     // For every luca
-    for(int i = 0; i < all.size(); i++)
+    for(Luca l: temp)
     {
       // If it is not the luca we're checking
-      if(!this.equals(all.get(i)))
+      if(!this.equals(l))
       {
         
         // Calculate the distance between the lucas
-        float distance = dist(this.loc.x, this.loc.y, all.get(i).loc.x, all.get(i).loc.y);
+        float distance = dist(this.loc.x, this.loc.y, l.loc.x, l.loc.y);
         // If they are touching
-        if(distance < (this.cell_w + all.get(i).cell_w + 1))
+        if(distance < (this.cell_w + l.cell_w + 1))
         {
           // If not already on the contacts list
-          if(!this.contacts.contains(all.get(i)))
+          if(!this.contacts.contains(l))
           {
             // Add it to the contacts list
-            this.contacts.add(all.get(i));
+            this.contacts.add(l);
           }
           // Return the luca it is touching
-          return all.get(i);
+          return l;
         }
         // If they are not touching
         else
         {
           // If the other luca is on the contacts list
-          if(this.contacts.contains(all.get(i)))
+          if(this.contacts.contains(l))
           {
             //println(this.id + " is no longer touching " + i);
             // Remove it from the contacts list
-            this.contacts.remove(all.get(i));
+            this.contacts.remove(l);
           }
         }
       }
@@ -515,7 +604,7 @@ PVector wallForce()
     // If no contacts are found, return null
     return null;
   }
-  
+  /*
   // Method to view all lucas a luca is contacting
   void viewContacts()
   {
@@ -523,10 +612,10 @@ PVector wallForce()
     for(int i = 0; i < this.contacts.size(); i++)
     {
       // Display the luca
-      println("Luca # " + this.id + ": Contact with " + all.indexOf(this.contacts.get(i)));
+      println("Luca # " + all.indexOf(this) + ": Contact with " + all.indexOf(this.contacts.get(i)));
     }
   }
-  
+  */
   // Spawns a cell in the center of the environment
   void spawn()
   {
@@ -545,36 +634,17 @@ PVector wallForce()
     */
   }
 
-  boolean eaten()
-  {
-    if(!(this instanceof Predator))
-    {
-      for(Luca pred: all_predators)
-      {
-        if(PVector.dist(this.loc, pred.loc) <= pred.cell_w)
-        {
-          pred.hunger -= this.cell_w;
-          pred.stam += this.cell_w;
-          // Limit hunger to zero
-          constrain(pred.hunger, 0, pred.max_hunger);
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   // Spawn luca on top of another luca
   Luca spawn(Luca l)
   {
     Luca l2 = null;
     if(l instanceof Predator)
     {
-      l2 = new Predator(l.loc.x, l.loc.y, l.cell_w, l.cell_h, 0, l.top_speed, l.rep_rate, l.max_force, l.max_hunger, l.max_stam, l.split_thresh, l.lifespan);
+      l2 = new Predator(l.loc.x, l.loc.y, l.cell_w, l.top_speed, l.rep_rate, l.max_force, l.max_hunger, l.max_stam, l.split_thresh, l.lifespan);
     }
     else
     {
-      l2 = new Luca(l.loc.x, l.loc.y, l.cell_w, l.cell_h, 0, l.top_speed, l.rep_rate, l.max_force, l.max_hunger, l.max_stam, l.split_thresh, l.lifespan);
+      l2 = new Luca(l.loc.x, l.loc.y, l.cell_w, l.top_speed, l.rep_rate, l.max_force, l.max_hunger, l.max_stam, l.split_thresh, l.lifespan);
     }
     
     l2.parent = l;
@@ -614,6 +684,25 @@ PVector wallForce()
     
     return l2;
   }
+
+  boolean eaten()
+  {
+    if(!(this instanceof Predator))
+    {
+      for(Luca pred: all_predators)
+      {
+        if(PVector.dist(this.loc, pred.loc) <= pred.cell_w)
+        {
+          pred.hunger -= this.cell_w;
+          pred.stam += this.cell_w;
+          // Limit hunger to zero
+          constrain(pred.hunger, 0, pred.max_hunger);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
   
     // Check if a luca touches an edge
   void checkEdges()
@@ -644,6 +733,7 @@ PVector wallForce()
     }
   }
 
+/*
   void arrive(PVector target)
   {
     // Desired velocity
@@ -675,6 +765,7 @@ PVector wallForce()
     // Apply force
     this.applyForce(force);
   }
+  */
 
   /*
   // Set luca's destination
@@ -714,6 +805,7 @@ PVector wallForce()
     }
   }
 */
+/*
   void moveDir(PVector d)
   {
     // Normalize and scale the vector
@@ -764,7 +856,7 @@ PVector wallForce()
       this.move();
     }
 
-
+*/
     /*
     // If not set...
      if(orig_loc == null || PVector.dist(orig_loc, this.loc) < 1)
@@ -811,19 +903,19 @@ PVector wallForce()
     // }
     // Initiate motion
     //this.move();
-  }
+  //}
 
   // Inititate motion
   void move()
   {
     this.acc.limit(max_force * mass);
     force = PVector.add(this.vel, this.acc);
-    this.vel = PVector.lerp(this.vel, force, 0.1);
-    this.vel.limit(this.top_speed);
+    this.vel = PVector.lerp(this.vel, force, 0.2);
+    //this.vel.limit(this.top_speed);
     this.loc.add(this.vel);
     this.acc.mult(0);
   }
-
+/*
   void setSpeed()
   {
     this.acc.normalize();
@@ -839,14 +931,15 @@ PVector wallForce()
     }
     this.dir = force;
     this.acc = dir;
-
+*/
     /*
     
      // Set the direction of acceleration
      this.dir = d;
      this.acc = this.dir;
      */
-  }
+  //}
+  /*
   void moveDir()
   {
     this.moveDir(this.dest, this.loc);
@@ -885,6 +978,7 @@ PVector wallForce()
       drawBack();
     }
   }
+  */
 
   /*
   public static Luca getLast()

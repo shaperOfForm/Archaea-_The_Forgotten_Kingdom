@@ -7,20 +7,17 @@ color new_spec_col;
 class Species
 {
   color col;
-  String diet;
+  //String diet;
   float width_avg;
-  float height_avg;
   float rep_rate_avg;
   float top_speed_avg;
   float max_hunger_avg;
   float max_stam_avg;
   float split_thresh_avg;
-  boolean nucleus = false;
   float lifespan_avg;
   float mut_rate_avg;
-  int num_organisms = 0;
-  String movement = null;
-  boolean gene_flow = false;
+  //String movement = null;
+  //boolean gene_flow = false;
   
   float mut_rate = .2;
   
@@ -33,9 +30,8 @@ class Species
   {
     this.col= color(random(255), random(255), random(255));
     new_spec_col = col;
-    this.diet = "Filter";
+    //this.diet = "Filter";
     this.width_avg = 20;
-    this.height_avg = 20;
     this.rep_rate_avg = 15;
     this.top_speed_avg = 1.2;
     this.lifespan_avg = 30;
@@ -43,9 +39,7 @@ class Species
     this.max_stam_avg = 100;
     this.split_thresh_avg = 50;
     this.mut_rate_avg = .2;
-    this.nucleus = false;
-    this.movement = null;
-    this.gene_flow = false;
+    //this.gene_flow = false;
     this.all_in_species = new ArrayList<Luca>();
     // Create initial luca
     Luca luca = new Luca();
@@ -59,9 +53,8 @@ class Species
   {
     this.col= color(random(255), random(255), random(255));
     new_spec_col = col;
-    this.diet = "Filter";
+    //this.diet = "Filter";
     this.width_avg = 10;
-    this.height_avg = 10;
     this.rep_rate_avg = 5;
     this.top_speed_avg = .8;
     this.lifespan_avg = 15;
@@ -83,9 +76,7 @@ class Species
   {
     this.col= color(random(255), random(255), random(255));
     new_spec_col = col;
-    this.diet = l.diet;
     this.width_avg = l.cell_w;
-    this.height_avg = l.cell_h;
     this.rep_rate_avg = l.rep_rate;
     this.top_speed_avg = l.top_speed;
     this.lifespan_avg = l.lifespan;
@@ -103,7 +94,6 @@ class Species
   void run()
   {
     ArrayList<Luca> new_lucas = new ArrayList<Luca>();
-
     // First loop: Update state of all Luca instances
     for(Luca l : this.all_in_species)
     {
@@ -129,7 +119,7 @@ class Species
       l.stam = constrain(l.stam, 0.0, l.max_stam);
 
       // If there are less lucas than the limit
-      if(all.size() < limit && l.stam > l.split_thresh && l.hunger < (l.max_hunger * .5) && l.life_remaining < l.lifespan - 20 && l.rep_prog >= l.rep_rate)
+      if(all.size() < limit && l.stam > l.split_thresh && l.hunger < (l.max_hunger * .75) && l.life_remaining < l.lifespan - 20 && l.rep_prog >= l.rep_rate)
       {
         // Replicate
         Luca new_luca = l.split();

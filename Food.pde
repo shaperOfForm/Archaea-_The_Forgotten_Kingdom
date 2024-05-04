@@ -2,19 +2,16 @@ class Food
 {
   float mass;
   PVector loc;
-  float G;
+  float G = 0.4;
   
   ArrayList<Food> all_food;
-
-  String img_path;
 
   PImage food_img;
 
   Food()
   {
     this.loc = new PVector(random(5, width-5), random(55, height-5));
-    this.mass = random(7, 12);
-    this.G = 0.4;
+    this.mass = random(4, 12);
     //println(food_img.width, food_img.height);
     this.food_img = food_imgs[int(random(0, food_imgs.length))];
   }
@@ -45,8 +42,8 @@ class Food
         
         if(luca instanceof Predator)
         {
-          luca.hunger -= .2*this.mass;
-          luca.stam += .2*this.mass;
+          luca.hunger -= .4*this.mass;
+          luca.stam += .4*this.mass;
         }
         else
         {
@@ -67,7 +64,7 @@ class Food
     }
     return false;
   }
-  
+  /*
   PVector attract(Luca luca)
   {
     PVector force = PVector.sub(this.loc, luca.loc);
@@ -79,4 +76,5 @@ class Food
     force.mult(strength);
     return force;
   }
+  */
 }
