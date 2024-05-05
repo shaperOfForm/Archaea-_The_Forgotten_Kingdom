@@ -62,35 +62,39 @@ class Predator extends Luca
         this.fitness += pow(this.children.size(), 2);
     }
     
-    void drawLuca()
-    {
-        noStroke();
-        noFill();
-        beginShape();
-        texture(pred_img);
-        if(!isPaused)
-        {
-            for (float i = 0; i < TWO_PI; i = i + 0.2)
-            {
-                int index = int(degrees(i)) % 360;
-                // Create edge of circle using sine and cosine
-                float x1 = sin_values[index] * this.cell_w;
-                float y1 = cos_values[index] * this.cell_w;
+    void drawLuca() {
+    noStroke();
+    noFill();
+    beginShape();
+    // Calculate the color based on the life_remaining
+    color startColor = color(255, 0, 0); // Red color
+    color endColor = color(pred_img.pixels[0]); // Original color of the image
+    float amt = map(this.life_remaining, 0, this.lifespan, 1, 0);
+    color interpColor = lerpColor(startColor, endColor, amt);
+    tint(interpColor); // Apply the color tint to the image
+    texture(pred_img);
+    if(!isPaused) {
+        for (float i = 0; i < TWO_PI; i = i + 0.2) {
+            int index = int(degrees(i)) % 360;
+            // Create edge of circle using sine and cosine
+            float x1 = sin_values[index] * this.cell_w;
+            float y1 = cos_values[index] * this.cell_w;
 
-                // Map the relative position of the vertex within the shape to the exact range of the image dimensions
-                float u = map(x1, -1.2*this.cell_w, 1.2*this.cell_w, 0, pred_img.width-0);
-                float v = map(y1, -1.2*this.cell_w, 1.2*this.cell_w, 0, pred_img.height-0); // Use height instead of width
+            // Map the relative position of the vertex within the shape to the exact range of the image dimensions
+            float u = map(x1, -1.2*this.cell_w, 1.2*this.cell_w, 0, pred_img.width);
+            float v = map(y1, -1.2*this.cell_w, 1.2*this.cell_w, 0, pred_img.height); 
 
-                // Add the offset to the edge coordinates
-                x1 += this.loc.x;
-                y1 += this.loc.y;
+            // Add the offset to the edge coordinates
+            x1 += this.loc.x;
+            y1 += this.loc.y;
 
-                // Create a curved line between the vertices
-                vertex(x1, y1, u, v);
-            }
-        endShape(CLOSE);
+            // Create a curved line between the vertices
+            vertex(x1, y1, u, v);
         }
     }
+    endShape(CLOSE);
+    noTint(); // Remove the tint for other drawings
+}
 
     PVector repel(Luca l)
     {
