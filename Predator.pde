@@ -15,19 +15,19 @@ class Predator extends Luca
     {
         super();
         
-        this.cell_w = map(dna.genes[1], 0, 1, 10, 70); // 25
+        this.cell_w = map(dna.genes[1], 0, 1, 20, 30); // 25
 
         // PLAY WITH TOP SPEED NEXT!!!!!!!
         // Then read the textbook 
         // Adjust UML and Components
-        this.top_speed = map(dna.genes[0], 0, 1, 20, 25); // 13
+        this.top_speed = map(dna.genes[0], 0, 1, 13, 17); // 13
         Luca closest_prey = null;
         this.rep_prog = random(4, 9);
-        this.rep_rate = map(dna.genes[2], 0, 1, 10, 15); // 30
-        this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
-        this.max_stam = map(dna.genes[5], 0, 1, 35, 55); // 150
-        this.split_thresh = map(dna.genes[6], 0, 1, 15, 25); //20;
-        this.lifespan = map(dna.genes[3], 0, 1, 200, 400); // 400
+        this.rep_rate = map(dna.genes[2], 0, 1, 30, 40); // 30
+        this.max_hunger = map(dna.genes[4], 0, 1, 200, 400); // 500
+        this.max_stam = map(dna.genes[5], 0, 1, 36, 55); // 150
+        this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); //20;
+        this.lifespan = map(dna.genes[3], 0, 1, 200, 300); // 400
         this.life_remaining = this.lifespan;
         all_predators.add(this);
         this.stam = 14;
@@ -40,14 +40,16 @@ class Predator extends Luca
         this.stam = 0;
         if(this instanceof Predator)
         {
-            this.top_speed = map(dna.genes[0], 0, 1, 20, 40);
-            this.cell_w = map(dna.genes[1], 0, 1, 15, 20); // 15
-            this.rep_rate = map(dna.genes[2], 0, 1, 20, 30); // 25
-            this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
-            this.mut_rate = map(dna.genes[7], 0, 1, .5, .75); //.25
-            this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
-            this.max_stam = map(dna.genes[5], 0, 1, 36, 55); // 150
-            this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
+            float offset = 0.1f; // Change this to the desired offset
+            this.top_speed = map(dna.genes[0], 0, 1, parent.top_speed * (1 - offset), parent.top_speed * (1 + offset));
+            this.cell_w = map(dna.genes[1], 0, 1, parent.cell_w * (1 - offset), parent.cell_w * (1 + offset));
+            this.cell_w = constrain(this.cell_w, 12, 35);
+            this.rep_rate = map(dna.genes[2], 0, 1, parent.rep_rate * (1 - offset), parent.rep_rate * (1 + offset));
+            this.lifespan = map(dna.genes[3], 0, 1, parent.lifespan * (1 - offset), parent.lifespan * (1 + offset));
+            this.mut_rate = map(dna.genes[7], 0, 1, parent.mut_rate * (1 - offset), parent.mut_rate * (1 + offset));
+            this.max_hunger = map(dna.genes[4], 0, 1, parent.max_hunger * (1 - offset), parent.max_hunger * (1 + offset));
+            this.max_stam = map(dna.genes[5], 0, 1, parent.max_stam * (1 - offset), parent.max_stam * (1 + offset));
+            this.split_thresh = map(dna.genes[6], 0, 1, parent.split_thresh * (1 - offset), parent.split_thresh * (1 + offset));
             all_predators.add(this);
         }
     }
@@ -59,7 +61,7 @@ class Predator extends Luca
         this.fitness += pow((.05*this.food_eaten), 2);
         this.fitness += pow(this.children.size(), 2);
     }
-
+    
     void drawLuca()
     {
         noStroke();

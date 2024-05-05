@@ -470,10 +470,12 @@ PVector wallForce()
         count++;
         
       }
+      
       sum.div(count);
       sum.setMag(this.top_speed);
       sum.sub(this.vel);
       sum.limit(this.max_force*this.mass);
+
     }
     return sum;
   }
