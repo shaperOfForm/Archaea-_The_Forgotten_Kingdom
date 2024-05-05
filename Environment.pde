@@ -4,6 +4,8 @@ class Environment
     
     int limit = 1200;
 
+    Biome biome;
+
     Environment()
     {
         all_food = new ArrayList<Food>();
@@ -11,6 +13,7 @@ class Environment
         {
             all_food.add(new Food());
         }
+        biome = new Biome();
     }
 
     void run()

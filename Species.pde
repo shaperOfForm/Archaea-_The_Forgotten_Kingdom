@@ -74,18 +74,7 @@ class Species
   
   Species(Luca l)
   {
-    this.col= color(random(255), random(255), random(255));
-    new_spec_col = col;
-    this.width_avg = l.cell_w;
-    this.rep_rate_avg = l.rep_rate;
-    this.top_speed_avg = l.top_speed;
-    this.lifespan_avg = l.lifespan;
-    this.max_hunger_avg = l.max_hunger;
-    this.max_stam_avg = l.max_stam;
-    this.split_thresh_avg = l.split_thresh;
-    this.mut_rate_avg = l.mut_rate;
-    this.all_in_species = new ArrayList<Luca>();
-    
+    this();
     l.spec.all_in_species.remove(l);
     l.spec = this;
     this.all_in_species.add(l);
@@ -212,13 +201,9 @@ class Species
       }
     }
   }
-  void speciate(Luca l)
+  Species speciate(Luca l)
   {
-    // Create a new species
-    Species new_spec = new Species(l);
-    // Add the new species to the list of known species
-    new_species.add(new_spec);
-    // Increment the number of species
-    //num_species++;
+    Species s = new Species(l);
+    return s;
   }
 }

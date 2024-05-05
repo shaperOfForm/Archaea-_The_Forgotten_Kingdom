@@ -94,6 +94,25 @@ class Predator extends Luca
     }
     endShape(CLOSE);
     noTint(); // Remove the tint for other drawings
+
+        // Draw a circular progress bar for the hunger level
+    stroke(255, 0, 0); // Red color for the progress bar
+    strokeWeight(4); // Make the progress bar a bit thicker
+    noFill(); // No fill for the progress bar
+    float hungerAngle = map(this.hunger, 0, 100, 0, TWO_PI); // Map the hunger level to an angle
+    arc(this.loc.x, this.loc.y, this.cell_w * 2, this.cell_w * 2, -HALF_PI, -HALF_PI + hungerAngle); // Draw the progress bar
+    strokeWeight(4); // Reset the stroke weight
+    stroke(0); // Reset the stroke color
+
+    // Draw a circular progress bar for the stamina level
+    stroke(255, 165, 0); // Blue color for the progress bar
+    float staminaAngle = map(this.stam, 0, 100, 0, TWO_PI); // Map the stamina level to an angle
+    arc(this.loc.x, this.loc.y, this.cell_w * 2, this.cell_w * 2, HALF_PI, HALF_PI + staminaAngle); // Draw the progress bar
+
+    strokeWeight(1); // Reset the stroke weight
+    stroke(0); // Reset the stroke color
+    //stroke(this.spec.col);
+    //ellipse(0,0,radius*2,radius*2);
 }
 
     PVector repel(Luca l)

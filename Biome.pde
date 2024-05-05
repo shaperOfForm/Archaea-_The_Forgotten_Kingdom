@@ -1,13 +1,23 @@
 class Biome
 {
-    
-    void speciate(Luca l)
+    ArrayList<Species> b;
+    ArrayList<Species> new_species = new ArrayList<Species>();
+
+    Biome()
     {
-        // Create a new species
-        Species new_spec = new Species(l);
-        // Add the new species to the list of known species
-        new_species.add(new_spec);
-        // Increment the number of species
-        //num_species++;
+        b = new ArrayList<Species>();
+    }
+
+    void run()
+    {
+        Iterator<Species> it = e.biome.b.iterator();
+        while(it.hasNext())
+        {
+            Species s = it.next();
+            s.run();
+        }
+        e.biome.b.addAll(new_species);
+        //e.biome.b.run();
+        redraw();
     }
 }

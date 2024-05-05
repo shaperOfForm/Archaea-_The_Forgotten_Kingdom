@@ -4,8 +4,6 @@ PImage back;
 
 Environment e;
 
-ArrayList<Species> biome;
-
 static int f_rate;
 
 PImage[] food_imgs;
@@ -81,16 +79,16 @@ void setup()
   back = loadImage("background" + back_num + ".jpg");
   
   e = new Environment();
-
-  biome = new ArrayList<Species>();
   
   s = new Species();
 
   predator = new Species(1);
 
-  biome.add(s);
+  e.biome = new Biome();
 
-  biome.add(predator);
+  e.biome.b.add(s);
+
+  e.biome.b.add(predator);
   
   
 }
@@ -225,7 +223,7 @@ void fastForward()
 void restart()
 {
   // Clear ArrayLists
-  biome.clear();
+  e.biome.b.clear();
   all.clear();
   all_prey.clear();
   all_predators.clear();
@@ -238,8 +236,7 @@ void restart()
   s.all_in_species.get(0).vel = new PVector(0, 0);
   s.all_in_species.get(0).acc = new PVector(0, 0);
   
-  s.run();
-  predator.run();
+  e.run();
   
   draw();
 }
@@ -383,13 +380,8 @@ void step()
   drawBack();
   e.run();
 
-  Iterator<Species> it = biome.iterator();
-  while(it.hasNext())
-  {
-    Species s = it.next();
-    s.run();
-  }
-  biome.addAll(new_species);
+  
+  e.biome.run();
   redraw();
 }
 
