@@ -99,11 +99,6 @@ class Species
     {
       l.fitness();
 
-      if(all_predators.get(0) != null)
-      {
-        //println(all_predators.get(0).fitness);
-      }
-
       // Detect contact constantly
       l.detectContact();
       l.checkEdges();

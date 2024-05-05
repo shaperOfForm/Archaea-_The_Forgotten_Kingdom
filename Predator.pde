@@ -69,7 +69,7 @@ class Predator extends Luca
     // Calculate the color based on the life_remaining
     color startColor = color(255, 0, 0); // Red color
     color endColor = color(pred_img.pixels[0]); // Original color of the image
-    float amt = map(this.life_remaining, 0, this.lifespan, 1, 0);
+    float amt = map(this.life_remaining, -600, this.lifespan, 1, 0);
     color interpColor = lerpColor(startColor, endColor, amt);
     tint(interpColor); // Apply the color tint to the image
     texture(pred_img);

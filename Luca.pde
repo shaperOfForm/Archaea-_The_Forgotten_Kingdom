@@ -483,9 +483,14 @@ PVector wallForce()
   // Display the luca
   void drawLuca()
   {
+    stroke(0);
+    // Calculate the color based on the life_remaining
+    color startColor = color(0, 0, 0); // Red color
+    color endColor = this.spec.col; // Original color of the Luca
+    float amt = map(this.life_remaining, 0, this.lifespan, 0, 1);
+    color interpColor = lerpColor(startColor, endColor, amt);
+    fill(interpColor); // Apply the color fill to the shape
     beginShape();
-    stroke(0, 0, 0);
-    fill(this.spec.col);
     if(!isPaused)
     {
       for (float i = 0; i < TWO_PI; i = i + 0.2)
@@ -515,6 +520,7 @@ PVector wallForce()
         curveVertex(x1, y1);
       }
     endShape(CLOSE);
+    noFill();
     }
     //stroke(this.spec.col);
     //ellipse(0,0,radius*2,radius*2);
