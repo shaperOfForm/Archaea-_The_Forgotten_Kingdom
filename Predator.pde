@@ -14,20 +14,20 @@ class Predator extends Luca
     Predator()
     {
         super();
-        
-        this.cell_w = map(dna.genes[1], 0, 1, 20, 30); // 25
 
         // PLAY WITH TOP SPEED NEXT!!!!!!!
         // Then read the textbook 
         // Adjust UML and Components
-        this.top_speed = map(dna.genes[0], 0, 1, 13, 17); // 13
+        
         Luca closest_prey = null;
         this.rep_prog = random(4, 9);
-        this.rep_rate = map(dna.genes[2], 0, 1, 30, 40); // 30
+        this.top_speed = map(dna.genes[0], 0, 1, 13, 15); // 13
+        this.cell_w = map(dna.genes[1], 0, 1, 23, 30); // 25
+        this.rep_rate = map(dna.genes[2], 0, 1, 50, 55); // 30
+        this.lifespan = map(dna.genes[3], 0, 1, 150, 250); // 400
         this.max_hunger = map(dna.genes[4], 0, 1, 200, 400); // 500
-        this.max_stam = map(dna.genes[5], 0, 1, 36, 55); // 150
-        this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); //20;
-        this.lifespan = map(dna.genes[3], 0, 1, 200, 300); // 400
+        this.mut_rate = map(dna.genes[5], 0, 1, .5, .75);
+        this.split_thresh = map(dna.genes[6], 0, 1, 40, 50); //20;
         this.life_remaining = this.lifespan;
         all_predators.add(this);
         this.stam = 14;
@@ -40,15 +40,15 @@ class Predator extends Luca
         this.stam = 0;
         if(this instanceof Predator)
         {
-            float offset = 0.1f; // Change this to the desired offset
+            float offset = 0.1f;
             this.top_speed = map(dna.genes[0], 0, 1, parent.top_speed * (1 - offset), parent.top_speed * (1 + offset));
             this.cell_w = map(dna.genes[1], 0, 1, parent.cell_w * (1 - offset), parent.cell_w * (1 + offset));
             this.cell_w = constrain(this.cell_w, 12, 35);
             this.rep_rate = map(dna.genes[2], 0, 1, parent.rep_rate * (1 - offset), parent.rep_rate * (1 + offset));
             this.lifespan = map(dna.genes[3], 0, 1, parent.lifespan * (1 - offset), parent.lifespan * (1 + offset));
-            this.mut_rate = map(dna.genes[7], 0, 1, parent.mut_rate * (1 - offset), parent.mut_rate * (1 + offset));
+            this.life_remaining = this.lifespan;
             this.max_hunger = map(dna.genes[4], 0, 1, parent.max_hunger * (1 - offset), parent.max_hunger * (1 + offset));
-            this.max_stam = map(dna.genes[5], 0, 1, parent.max_stam * (1 - offset), parent.max_stam * (1 + offset));
+            this.mut_rate = map(dna.genes[5], 0, 1, parent.mut_rate * (1 - offset), parent.mut_rate * (1 + offset));
             this.split_thresh = map(dna.genes[6], 0, 1, parent.split_thresh * (1 - offset), parent.split_thresh * (1 + offset));
             all_predators.add(this);
         }
@@ -69,7 +69,7 @@ class Predator extends Luca
     // Calculate the color based on the life_remaining
     color startColor = color(255, 0, 0); // Red color
     color endColor = color(pred_img.pixels[0]); // Original color of the image
-    float amt = map(this.life_remaining, -600, this.lifespan, 1, 0);
+    float amt = map(this.life_remaining, -300, this.lifespan, 1, 0);
     color interpColor = lerpColor(startColor, endColor, amt);
     tint(interpColor); // Apply the color tint to the image
     texture(pred_img);
@@ -99,14 +99,14 @@ class Predator extends Luca
     stroke(0, 255, 0); // Red color for the progress bar
     strokeWeight(4); // Make the progress bar a bit thicker
     noFill(); // No fill for the progress bar
-    float hungerAngle = map(this.hunger, 0, 100, PI, 0); // Map the hunger level to an angle
+    float hungerAngle = map(this.hunger, 0, this.max_hunger, PI, 0); // Map the hunger level to an angle
     arc(this.loc.x, this.loc.y, this.cell_w * 2, this.cell_w * 2, -HALF_PI, -HALF_PI + hungerAngle); // Draw the progress bar
     strokeWeight(4); // Reset the stroke weight
     stroke(0); // Reset the stroke color
 
     // Draw a circular progress bar for the stamina level
     stroke(255, 210, 0); // Blue color for the progress bar
-    float staminaAngle = map(this.stam, 0, 100, 0, PI); // Map the stamina level to an angle
+    float staminaAngle = map(this.stam, 0, this.split_thresh, 0, PI); // Map the stamina level to an angle
     arc(this.loc.x, this.loc.y, this.cell_w * 2, this.cell_w * 2, HALF_PI, HALF_PI + staminaAngle); // Draw the progress bar
 
     strokeWeight(1); // Reset the stroke weight
@@ -186,7 +186,7 @@ class Predator extends Luca
         // If the predators are touching
         if(this.contacts.size() > 0)
         {
-            force.mult(3);
+            force.mult(6);
             this.applyForce(force);
         }
 

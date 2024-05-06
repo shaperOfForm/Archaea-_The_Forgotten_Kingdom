@@ -74,10 +74,15 @@ class Species
   
   Species(Luca l)
   {
-    this();
-    l.spec.all_in_species.remove(l);
-    l.spec = this;
-    this.all_in_species.add(l);
+    this.col= color(random(255), random(255), random(255));
+    new_spec_col = col;
+    this.all_in_species = new ArrayList<Luca>();
+    //this.all_in_species.add(l);
+    Luca l2 = l.spawn(l);
+
+    println("Species created from Luca");
+    //l.spec.all_in_species.remove(l);
+    //this.all_in_species.add(l);
   }
 
   void run()
@@ -107,7 +112,7 @@ class Species
 
       // Increase stamina constantly
       //l.stam++;
-      l.stam = constrain(l.stam, 0.0, l.max_stam);
+      l.stam = constrain(l.stam, 0.0, l.split_thresh + 1);
 
       // If there are less lucas than the limit
       if(all.size() < limit && l.stam > l.split_thresh && l.hunger < (l.max_hunger * .75) && l.life_remaining < l.lifespan - 20 && l.rep_prog >= l.rep_rate)
@@ -203,6 +208,7 @@ class Species
   }
   Species speciate(Luca l)
   {
+    println("Speciating from Luca");
     Species s = new Species(l);
     return s;
   }

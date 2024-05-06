@@ -3,7 +3,7 @@ class DNA
     float[] genes;
     DNA()
     {
-        this.genes = new float[8];
+        this.genes = new float[7];
         for(int i = 0; i < this.genes.length; i++)
         {
             this.genes[i] = random(0, 1);

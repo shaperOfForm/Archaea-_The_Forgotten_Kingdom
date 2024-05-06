@@ -6,7 +6,6 @@ PVector sum;
 class Luca
 {
   // Attributes
-  float max_stam;
   String diet;
   float cell_w;
   float cell_h;
@@ -92,15 +91,14 @@ class Luca
     
     // If the luca's go in circles around food, increase max_force
 
-    this.stam = random(0, 5);
+    this.stam = random(15, 19);
     this.top_speed = map(dna.genes[0], 0, 1, 20, 40);
     this.cell_w = map(dna.genes[1], 0, 1, 15, 20); // 15
-    this.rep_rate = map(dna.genes[2], 0, 1, 20, 30); // 25
+    this.rep_rate = map(dna.genes[2], 0, 1, 15, 30); // 25
     this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
     this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
-    this.max_stam = map(dna.genes[5], 0, 1, 35, 55); // 150
+    this.mut_rate = map(dna.genes[5], 0, 1, .5, .75); //.25
     this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
-    this.mut_rate = map(dna.genes[7], 0, 1, .5, .75); //.25
     this.cell_h = 15;
     this.mass = 64656.70908252886 / (this.cell_w/2 * this.cell_w/2 * this.cell_w/2);
     this.parent = null;
@@ -135,18 +133,17 @@ class Luca
     this.spec = parent.spec;
     this.col = parent.col;
     this.dna = parent.dna.copy();
-    this.mut_rate = parent.mut_rate;
     this.mutate();
     if(!(this instanceof Predator))
     {
-      this.top_speed = map(dna.genes[0], 0, 1, 20, 40);
-      this.cell_w = map(dna.genes[1], 0, 1, 15, 20); // 15
-      this.rep_rate = map(dna.genes[2], 0, 1, 20, 30); // 25
-      this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
-      this.mut_rate = map(dna.genes[7], 0, 1, .5, .75); //.25
-      this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
-      this.max_stam = map(dna.genes[5], 0, 1, 36, 55); // 150
-      this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
+      float offset = 0.1f;
+      this.top_speed = map(dna.genes[0], 0, 1, parent.top_speed * (1 - offset), parent.top_speed * (1 + offset));
+      this.cell_w = map(dna.genes[1], 0, 1, parent.cell_w * (1 - offset), parent.cell_w * (1 + offset)); // 15
+      this.rep_rate = map(dna.genes[2], 0, 1, parent.rep_rate * (1 - offset), parent.rep_rate * (1 + offset)); // 25
+      this.lifespan = map(dna.genes[3], 0, 1, parent.lifespan * (1 - offset), parent.lifespan * (1 + offset)); // 150
+      this.max_hunger = map(dna.genes[4], 0, 1, parent.max_hunger * (1 - offset), parent.max_hunger * (1 + offset)); // 500
+      this.mut_rate = map(dna.genes[5], 0, 1, parent.mut_rate * (1 - offset), parent.mut_rate * (1 + offset)); //.25
+      this.split_thresh = map(dna.genes[6], 0, 1, parent.split_thresh * (1 - offset), parent.split_thresh * (1 + offset)); // 30
       this.rep_prog = random(0, 3);
     }
   }
@@ -225,18 +222,27 @@ class Luca
     // Flock
     int i = (int)(this.loc.x / this.cell_w);
     int j = (int)(this.loc.y / this.cell_w);
-    i = min(i, grid.length - 1);
-    j = min(j, grid[0].length - 1);
+    i = constrain(i, 0, grid.length - 1);
+    j = constrain(j, 0, grid[0].length - 1);
     
     ArrayList<Luca> temp = grid[i][j];
     for(Luca l2: temp)
     {
       if(this != l2)
       {
-        for(int k = 0; k < 3; k++)
+        if(this.spec.equals(l2.spec))
         {
-          force = this.flock()[k];
-          force.mult(2);
+          for(int k = 0; k < 3; k++)
+          {
+            force = this.flock()[k];
+            force.mult(2);
+            this.applyForce(force);
+          }
+        }
+        else
+        {
+          force = this.separate();
+          force.mult(8);
           this.applyForce(force);
         }
       }
@@ -291,8 +297,8 @@ PVector[] flock()
   PVector coh = cohesion();
 
   sep.mult(2.0);
-  ali.mult(1.0);
-  coh.mult(1.5);
+  ali.mult(3.0);
+  coh.mult(2.0);
 
   return new PVector[]{sep, ali, coh};
 }
@@ -527,14 +533,14 @@ PVector wallForce()
     stroke(0, 255, 0); // Red color for the progress bar
     strokeWeight(4); // Make the progress bar a bit thicker
     noFill(); // No fill for the progress bar
-    float hungerAngle = map(this.hunger, 0, 100, 0, PI); // Map the hunger level to an angle
+    float hungerAngle = map(this.hunger, 0, this.max_hunger, PI, 0); // Map the hunger level to an angle
     arc(this.loc.x, this.loc.y, this.cell_w * 2, this.cell_w * 2, -HALF_PI, -HALF_PI + hungerAngle); // Draw the progress bar
     strokeWeight(4); // Reset the stroke weight
     stroke(0); // Reset the stroke color
 
     // Draw a circular progress bar for the stamina level
     stroke(255, 210, 0); // Blue color for the progress bar
-    float staminaAngle = map(this.stam, 0, 100, 0, PI); // Map the stamina level to an angle
+    float staminaAngle = map(this.stam, 0, this.split_thresh, 0, PI); // Map the stamina level to an angle
     arc(this.loc.x, this.loc.y, this.cell_w * 2, this.cell_w * 2, HALF_PI, HALF_PI + staminaAngle); // Draw the progress bar
 
     strokeWeight(1); // Reset the stroke weight
@@ -601,8 +607,8 @@ PVector wallForce()
       int i = (int)(this.loc.x / this.cell_w);
       int j = (int)(this.loc.y / this.cell_w);
       // Apply forces only to Luca objects in the same cell
-      i = min(i, grid.length - 1);
-      j = min(j, grid[0].length - 1);
+      i = constrain(i, 0, grid.length - 1);
+      j = constrain(j, 0, grid[0].length - 1);
 
       temp = grid[i][j];
     }

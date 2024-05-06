@@ -23,7 +23,7 @@ ArrayList<Species> new_species = new ArrayList<Species>();
 ArrayList<Luca> all = new ArrayList<Luca>();
 
 ArrayList<Luca>[][] grid;
-int grid_cell_size = 10;
+int grid_cell_size = 17;
 int cols;
 int rows;
 
@@ -404,6 +404,8 @@ void drawPanel()
     // Add restart button to panel
     restartButton();
     aboutButton();
+
+    drawLegend();
   }
   else
   {
@@ -411,4 +413,21 @@ void drawPanel()
     rect(0, 0, width, 50);
     aboutButton();
   }
+}
+
+void drawLegend()
+{
+  textSize(20); // Increase the text size
+
+  // Draw color indicator for hunger
+  fill(0, 255, 0); // Green color
+  rect(width - 150, 10, 15, 15); // Increase the size of the rectangle
+  fill(0); // Black color for the text
+  text("HUNGER", width - 130, 25); // Adjust the position of the label
+
+  // Draw color indicator for reproduction
+  fill(255, 210, 0); // Yellow color
+  rect(width - 150, 30, 15, 15); // Increase the size of the rectangle
+  fill(0); // Black color for the text
+  text("REPRODUCE", width - 130, 45); // Adjust the position of the label
 }
