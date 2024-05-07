@@ -3,13 +3,13 @@ class Biome
     ArrayList<Species> b;
     ArrayList<Luca> new_lucas = new ArrayList<Luca>();
     ArrayList<Luca> to_remove = new ArrayList<Luca>();
-
+    Species new_species = null;
+    
     Biome()
     {
         b = new ArrayList<Species>();
     }
 
-    Species new_species = null;
     void run()
     {
         Iterator<Species> it = b.iterator();

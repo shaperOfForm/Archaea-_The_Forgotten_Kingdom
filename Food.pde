@@ -10,7 +10,7 @@ class Food
 
   Food()
   {
-    this.loc = new PVector(random(5, width-5), random(55, height-5));
+    this.loc = new PVector(random(15, width-15), random(65, height-15));
     this.mass = random(4, 12);
     //println(food_img.width, food_img.height);
     this.food_img = food_imgs[int(random(0, food_imgs.length))];
@@ -42,8 +42,8 @@ class Food
         
         if(luca instanceof Predator)
         {
-          luca.hunger -= .5*this.mass;
-          luca.stam += .5*this.mass;
+          luca.hunger -= .75*this.mass;
+          luca.stam += .75*this.mass;
         }
         else
         {

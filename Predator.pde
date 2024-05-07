@@ -5,10 +5,6 @@ class Predator extends Luca
 {
     
     Luca closest_prey;
-    String img_path;
-
-    float fitness;
-
     int prey_eaten;
 
     Predator()
@@ -23,35 +19,33 @@ class Predator extends Luca
         this.rep_prog = random(4, 9);
         this.top_speed = map(dna.genes[0], 0, 1, 13, 15); // 13
         this.cell_w = map(dna.genes[1], 0, 1, 23, 30); // 25
-        this.rep_rate = map(dna.genes[2], 0, 1, 50, 55); // 30
-        this.lifespan = map(dna.genes[3], 0, 1, 150, 250); // 400
+        this.rep_rate = map(dna.genes[2], 0, 1, 40, 45); // 30
+        this.lifespan = map(dna.genes[3], 0, 1, 200, 300); // 400
         this.max_hunger = map(dna.genes[4], 0, 1, 200, 400); // 500
         this.mut_rate = map(dna.genes[5], 0, 1, .5, .75);
         this.split_thresh = map(dna.genes[6], 0, 1, 40, 50); //20;
         this.life_remaining = this.lifespan;
         all_predators.add(this);
-        this.stam = 14;
+        this.stam = this.split_thresh - 20;
         this.hunger = 0;
         this.prey_eaten = 0;
+        this.rep_prog = 30;
     }
     Predator(float x, float y, Predator parent)
     {
         super(x, y, parent);
         this.stam = 0;
-        if(this instanceof Predator)
-        {
-            float offset = 0.1f;
-            this.top_speed = map(dna.genes[0], 0, 1, parent.top_speed * (1 - offset), parent.top_speed * (1 + offset));
-            this.cell_w = map(dna.genes[1], 0, 1, parent.cell_w * (1 - offset), parent.cell_w * (1 + offset));
-            this.cell_w = constrain(this.cell_w, 12, 35);
-            this.rep_rate = map(dna.genes[2], 0, 1, parent.rep_rate * (1 - offset), parent.rep_rate * (1 + offset));
-            this.lifespan = map(dna.genes[3], 0, 1, parent.lifespan * (1 - offset), parent.lifespan * (1 + offset));
-            this.life_remaining = this.lifespan;
-            this.max_hunger = map(dna.genes[4], 0, 1, parent.max_hunger * (1 - offset), parent.max_hunger * (1 + offset));
-            this.mut_rate = map(dna.genes[5], 0, 1, parent.mut_rate * (1 - offset), parent.mut_rate * (1 + offset));
-            this.split_thresh = map(dna.genes[6], 0, 1, parent.split_thresh * (1 - offset), parent.split_thresh * (1 + offset));
-            all_predators.add(this);
-        }
+        float offset = 0.1f;
+        this.top_speed = map(dna.genes[0], 0, 1, parent.top_speed * (1 - offset), parent.top_speed * (1 + offset));
+        this.cell_w = map(dna.genes[1], 0, 1, parent.cell_w * (1 - offset), parent.cell_w * (1 + offset));
+        this.cell_w = constrain(this.cell_w, 12, 35);
+        this.rep_rate = map(dna.genes[2], 0, 1, parent.rep_rate * (1 - offset), parent.rep_rate * (1 + offset));
+        this.lifespan = map(dna.genes[3], 0, 1, parent.lifespan * (1 - offset), parent.lifespan * (1 + offset));
+        this.life_remaining = this.lifespan;
+        this.max_hunger = map(dna.genes[4], 0, 1, parent.max_hunger * (1 - offset), parent.max_hunger * (1 + offset));
+        this.mut_rate = map(dna.genes[5], 0, 1, parent.mut_rate * (1 - offset), parent.mut_rate * (1 + offset));
+        this.split_thresh = map(dna.genes[6], 0, 1, parent.split_thresh * (1 - offset), parent.split_thresh * (1 + offset));
+        all_predators.add(this);
     }
 
     @Override
@@ -69,12 +63,14 @@ class Predator extends Luca
     // Calculate the color based on the life_remaining
     color startColor = color(255, 0, 0); // Red color
     color endColor = color(pred_img.pixels[0]); // Original color of the image
-    float amt = map(this.life_remaining, -300, this.lifespan, 1, 0);
+    float amt = map(this.life_remaining, -200, this.lifespan, 1, 0);
     color interpColor = lerpColor(startColor, endColor, amt);
     tint(interpColor); // Apply the color tint to the image
     texture(pred_img);
-    if(!isPaused) {
-        for (float i = 0; i < TWO_PI; i = i + 0.2) {
+    if(!isPaused) 
+    {
+        for (float i = 0; i < TWO_PI; i = i + 0.2) 
+        {
             int index = int(degrees(i)) % 360;
             // Create edge of circle using sine and cosine
             float x1 = sin_values[index] * this.cell_w;

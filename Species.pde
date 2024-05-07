@@ -12,41 +12,57 @@ class Species
   float rep_rate_avg;
   float top_speed_avg;
   float max_hunger_avg;
-  float max_stam_avg;
   float split_thresh_avg;
   float lifespan_avg;
   float mut_rate_avg;
+
+  float width_var;
+  float rep_rate_var;
+  float top_speed_var;
+  float max_hunger_var;
+  float split_thresh_var;
+  float lifespan_var;
+  float mut_rate_var;
   //String movement = null;
   //boolean gene_flow = false;
   
-  float mut_rate = .2;
+  //float mut_rate = .2;
   
   ArrayList<Luca> all_in_species;
 
   boolean speciate = false;
+
+  float sq_of_width_avg;
+  float sq_of_rep_rate_avg;
+  float sq_of_top_speed_avg;
+  float sq_of_max_hunger_avg;
+  float sq_of_split_thresh_avg;
+  float sq_of_lifespan_avg;
+  float sq_of_mut_rate_avg;
   
 
   Species()
   {
     this.col= color(random(255), random(255), random(255));
     new_spec_col = col;
-    //this.diet = "Filter";
-    this.width_avg = 20;
-    this.rep_rate_avg = 15;
-    this.top_speed_avg = 1.2;
-    this.lifespan_avg = 30;
-    this.max_hunger_avg = 100;
-    this.max_stam_avg = 100;
-    this.split_thresh_avg = 50;
-    this.mut_rate_avg = .75;
-    //this.gene_flow = false;
     this.all_in_species = new ArrayList<Luca>();
+    //this.diet = "Filter";
+    this.width_avg = 0;
+    this.rep_rate_avg = 0;
+    this.top_speed_avg = 0;
+    this.lifespan_avg = 0;
+    this.max_hunger_avg = 0;
+    this.split_thresh_avg = 0;
+    this.mut_rate_avg = 0;
+    //this.gene_flow = false;
+    
     // Create initial luca
     Luca luca = new Luca();
     luca.spec = this;
     this.all_in_species.add(luca);
     // Spawn first luca
     luca.spawn();
+
   }
 
   Species(int n)
@@ -59,7 +75,6 @@ class Species
     this.top_speed_avg = .8;
     this.lifespan_avg = 15;
     this.max_hunger_avg = 50;
-    this.max_stam_avg = 50;
     this.split_thresh_avg = 25;
     this.mut_rate_avg = .2;
     this.all_in_species = new ArrayList<Luca>();
@@ -113,7 +128,7 @@ class Species
       // Increase stamina constantly
       //l.stam++;
       l.stam = constrain(l.stam, 0.0, l.split_thresh + 1);
-
+      
       // If there are less lucas than the limit
       if(all.size() < limit && l.stam > l.split_thresh && l.hunger < (l.max_hunger * .75) && l.life_remaining < l.lifespan - 20 && l.rep_prog >= l.rep_rate)
       {

@@ -28,7 +28,7 @@ int cols;
 int rows;
 
 // Set luca limit
-int limit = 150;
+int limit = 75;
 
 void setup()
 {
@@ -334,7 +334,9 @@ void keyPressed() {
 // Draw background
 void drawBack()
 {
+  tint(100);
   image(back, 0, 0, width, height);
+  tint(255);
 }
 
 void restartButton()

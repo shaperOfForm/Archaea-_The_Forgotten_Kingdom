@@ -6,7 +6,7 @@ PVector sum;
 class Luca
 {
   // Attributes
-  String diet;
+  //String diet;
   float cell_w;
   float cell_h;
   PVector loc;
@@ -15,8 +15,7 @@ class Luca
   float speed;
   float stam;
   float rep_rate;
-  int id;
-  boolean can_move = true;
+  //boolean can_move = true;
   float mass;
 
   Species spec;
@@ -87,19 +86,18 @@ class Luca
     this.dna = new DNA();
 
     
-    this.max_force = 999999999;
+    this.max_force = 200;
     
     // If the luca's go in circles around food, increase max_force
 
     this.stam = random(15, 19);
-    this.top_speed = map(dna.genes[0], 0, 1, 20, 40);
+    this.top_speed = map(dna.genes[0], 0, 1, 30, 40);
     this.cell_w = map(dna.genes[1], 0, 1, 15, 20); // 15
-    this.rep_rate = map(dna.genes[2], 0, 1, 15, 30); // 25
+    this.rep_rate = map(dna.genes[2], 0, 1, 15, 25); // 25
     this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
     this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
     this.mut_rate = map(dna.genes[5], 0, 1, .5, .75); //.25
     this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
-    this.cell_h = 15;
     this.mass = 64656.70908252886 / (this.cell_w/2 * this.cell_w/2 * this.cell_w/2);
     this.parent = null;
     this.children = new ArrayList<Luca>();
@@ -119,7 +117,8 @@ class Luca
     {
       all_prey.add(this);
     }
-    this.rep_prog = 0;
+    this.rep_prog = 12;
+    this.stam = this.split_thresh;
     this.col = new_spec_col;
   }
   // Constructor with parameters
@@ -235,11 +234,11 @@ class Luca
           for(int k = 0; k < 3; k++)
           {
             force = this.flock()[k];
-            force.mult(2);
+            force.mult(40);
             this.applyForce(force);
           }
         }
-        else
+        else if(!(l2 instanceof Predator))
         {
           force = this.separate();
           force.mult(8);
@@ -275,7 +274,7 @@ class Luca
 
       //********** Bigger wall force */
 
-      force.mult(5);
+      force.mult(3);
       this.applyForce(force);
     }
   }
@@ -286,7 +285,7 @@ class Luca
     force.normalize();
     force.mult(this.top_speed);
     force.sub(this.vel);
-    force.limit(this.max_force);
+    force.limit(2*this.max_force*this.mass);
     return force;
   }
 
@@ -296,9 +295,9 @@ PVector[] flock()
   PVector ali = align();
   PVector coh = cohesion();
 
-  sep.mult(2.0);
+  sep.mult(1.0);
   ali.mult(3.0);
-  coh.mult(2.0);
+  coh.mult(3.0);
 
   return new PVector[]{sep, ali, coh};
 }
@@ -350,7 +349,7 @@ PVector align()
     sum.mult(this.top_speed);
 
     force = sum.sub(this.vel);
-    force.limit(this.max_force);
+    force.limit(2*this.max_force*this.mass);
     return force;
   }
   else
@@ -369,25 +368,25 @@ PVector wallForce()
 
   if(this.loc.x > width - margin)
   {
-    float forceStrength = map(this.loc.x, width - margin, width, 0, this.max_force);
+    float forceStrength = map(this.loc.x, width - margin, width, 0, 2*this.max_force*this.mass);
     force.add(new PVector(-forceStrength, 0));
     count++;
   }
   else if(this.loc.x < margin)
   {
-    float forceStrength = map(this.loc.x, 0, margin, this.max_force, 0);
+    float forceStrength = map(this.loc.x, 0, margin, 2*this.max_force*this.mass, 0);
     force.add(new PVector(forceStrength, 0));
     count++;
   }
   if(this.loc.y > height - margin)
   {
-    float forceStrength = map(this.loc.y, height - margin, height, 0, this.max_force);
+    float forceStrength = map(this.loc.y, height - margin, height, 0, 2*this.max_force*this.mass);
     force.add(new PVector(0, -forceStrength));
     count++;
   }
   else if(this.loc.y < margin)
   {
-    float forceStrength = map(this.loc.y, 0, margin, this.max_force, 0);
+    float forceStrength = map(this.loc.y, 0, margin, 2*this.max_force*this.mass, 0);
     force.add(new PVector(0, forceStrength));
     count++;
   }
@@ -427,7 +426,7 @@ PVector wallForce()
       force.normalize();
       force.mult(this.top_speed);
       force.sub(this.vel);
-      force.limit(4*this.max_force*this.mass);
+      force.limit(300*this.max_force*this.mass);
       return force;
     }
     else
@@ -953,8 +952,8 @@ PVector wallForce()
   {
     this.acc.limit(max_force * mass);
     force = PVector.add(this.vel, this.acc);
-    this.vel = PVector.lerp(this.vel, force, 0.2);
-    //this.vel.limit(this.top_speed);
+    this.vel = PVector.lerp(this.vel, force, 0.15);
+    this.vel.limit(this.top_speed);
     this.loc.add(this.vel);
     this.acc.mult(0);
   }
@@ -1040,9 +1039,10 @@ PVector wallForce()
    }
    */
 
-  String toString()
+ /* String toString()
   {
-    String str = "Luca number: " + this.id + "\n";
+    String str = "Luca number: " + t + "\n";
     return str;
   }
+  */
 }
