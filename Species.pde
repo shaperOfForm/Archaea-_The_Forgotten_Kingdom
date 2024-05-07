@@ -43,8 +43,7 @@ class Species
 
   Species()
   {
-    colorMode(HSB);
-    this.col= color(random(0, 255), 180, 180);
+    this.col= color(random(255), random(255), random(255));
     new_spec_col = col;
     this.all_in_species = new ArrayList<Luca>();
     //this.diet = "Filter";
@@ -63,6 +62,7 @@ class Species
     this.all_in_species.add(luca);
     // Spawn first luca
     luca.spawn();
+
   }
 
   Species(int n)
@@ -89,9 +89,8 @@ class Species
   
   Species(Luca l)
   {
-    colorMode(HSB);
-    this.col= color((hue(l.col) + 150)%255, 180, 180);
-    new_spec_col = this.col;
+    this.col= color(random(255), random(255), random(255));
+    new_spec_col = col;
     this.all_in_species = new ArrayList<Luca>();
     //this.all_in_species.add(l);
     Luca l2 = l.spawn(l);

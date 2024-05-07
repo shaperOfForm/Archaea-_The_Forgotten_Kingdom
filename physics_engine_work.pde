@@ -85,11 +85,10 @@ void setup()
   e = new Environment();
   
   s = new Species();
-  
-  s2 = new Species();
-  s2.col = color((hue(s.all_in_species.get(0).col) + 127.5)%255, 180, 180);
 
+  s2 = new Species();
   s2.all_in_species.get(0).loc = new PVector(width - 100, 100);
+
   //s3 = new Species();
   //s3.all_in_species.get(0).loc = new PVector(100, height - 100);
 
@@ -434,13 +433,13 @@ void drawLegend()
   textSize(20); // Increase the text size
 
   // Draw color indicator for hunger
-  fill(map(60, 0, 360, 0, 255), 255, 255); // Green color
+  fill(0, 255, 0); // Green color
   rect(width - 150, 10, 15, 15); // Increase the size of the rectangle
   fill(0); // Black color for the text
   text("HUNGER", width - 130, 25); // Adjust the position of the label
 
   // Draw color indicator for reproduction
-  fill(map(120, 0, 360, 0, 255), 255, 255); // Yellow color
+  fill(255, 210, 0); // Yellow color
   rect(width - 150, 30, 15, 15); // Increase the size of the rectangle
   fill(0); // Black color for the text
   text("REPRODUCE", width - 130, 45); // Adjust the position of the label

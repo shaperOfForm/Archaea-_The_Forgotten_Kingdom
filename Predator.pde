@@ -64,8 +64,8 @@ class Predator extends Luca
     noFill();
     beginShape();
     // Calculate the color based on the life_remaining
-    color startColor = color(map(0, 0, 360, 0, 255), 255, 255); // Red color
-    color endColor = color(pred_img.pixels[0], pred_img.pixels[1], 0); // Original color of the image
+    color startColor = color(255, 0, 0); // Red color
+    color endColor = color(pred_img.pixels[0]); // Original color of the image
     float amt = map(this.life_remaining, -200, this.lifespan, 1, 0);
     color interpColor = lerpColor(startColor, endColor, amt);
     tint(interpColor); // Apply the color tint to the image
@@ -95,7 +95,7 @@ class Predator extends Luca
     noTint(); // Remove the tint for other drawings
 
         // Draw a circular progress bar for the hunger level
-    stroke(map(120, 0, 360, 0, 255), 255, 255); // Red color for the progress bar
+    stroke(0, 255, 0); // Red color for the progress bar
     strokeWeight(4); // Make the progress bar a bit thicker
     noFill(); // No fill for the progress bar
     float hungerAngle = map(this.hunger, 0, this.max_hunger, PI, 0); // Map the hunger level to an angle
@@ -104,7 +104,7 @@ class Predator extends Luca
     stroke(0); // Reset the stroke color
 
     // Draw a circular progress bar for the stamina level
-    stroke(map(60, 0, 360, 0, 255), 255, 255); // Blue color for the progress bar
+    stroke(255, 210, 0); // Blue color for the progress bar
     float staminaAngle = map(this.stam, 0, this.split_thresh, 0, PI); // Map the stamina level to an angle
     arc(this.loc.x, this.loc.y, this.cell_w * 2, this.cell_w * 2, HALF_PI, HALF_PI + staminaAngle); // Draw the progress bar
 
