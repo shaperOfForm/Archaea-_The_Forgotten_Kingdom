@@ -92,7 +92,7 @@ class Luca
 
     this.top_speed = map(dna.genes[0], 0, 1, 27, 27);
     this.cell_w = map(dna.genes[1], 0, 1, 18, 18); // 15
-    this.rep_rate = map(dna.genes[2], 0, 1, 10, 10); // 25
+    this.rep_rate = map(dna.genes[2], 0, 1, 25, 25); // 25
     this.lifespan = map(dna.genes[3], 0, 1, 480, 480); // 150
     this.max_hunger = map(dna.genes[4], 0, 1, 105, 105); // 500
     this.mut_rate = map(dna.genes[5], 0, 1, .65, .65); //.25
@@ -117,7 +117,7 @@ class Luca
       all_prey.add(this);
     }
     this.rep_prog = 12;
-    this.stam = this.split_thresh - 10;
+    this.stam = this.split_thresh - 20;
     this.col = new_spec_col;
   }
   // Constructor with parameters
@@ -493,7 +493,7 @@ PVector wallForce()
   {
     stroke(0);
     // Calculate the color based on the life_remaining
-    color startColor = color(0); // Start color of the Luca
+    color startColor = color(0, 0, 0); // Start color of the Luca
     color endColor = this.spec.col; // Original color of the Luca
     float amt = map(this.life_remaining, 0, this.lifespan, 0, 1);
     color interpColor = lerpColor(startColor, endColor, amt);
@@ -532,7 +532,7 @@ PVector wallForce()
     }
     
     // Draw a circular progress bar for the hunger level
-    stroke(0, 255, 0); // Red color for the progress bar
+    stroke(map(120, 0, 360, 0, 255), 255, 255); // Bright green color for the progress bar
     strokeWeight(4); // Make the progress bar a bit thicker
     noFill(); // No fill for the progress bar
     float hungerAngle = map(this.hunger, 0, this.max_hunger, PI, 0); // Map the hunger level to an angle
@@ -541,7 +541,7 @@ PVector wallForce()
     stroke(0); // Reset the stroke color
 
     // Draw a circular progress bar for the stamina level
-    stroke(255, 210, 0); // Blue color for the progress bar
+    stroke(map(60, 0, 360, 0, 255), 255, 255); // Blue color for the progress bar
     float staminaAngle = map(this.stam, 0, this.split_thresh, 0, PI); // Map the stamina level to an angle
     arc(this.loc.x, this.loc.y, this.cell_w * 2, this.cell_w * 2, HALF_PI, HALF_PI + staminaAngle); // Draw the progress bar
 
