@@ -86,18 +86,17 @@ class Luca
     this.dna = new DNA();
 
     
-    this.max_force = 200;
+    this.max_force = 500;
     
     // If the luca's go in circles around food, increase max_force
 
-    this.stam = random(15, 19);
-    this.top_speed = map(dna.genes[0], 0, 1, 30, 40);
-    this.cell_w = map(dna.genes[1], 0, 1, 15, 20); // 15
-    this.rep_rate = map(dna.genes[2], 0, 1, 15, 25); // 25
-    this.lifespan = map(dna.genes[3], 0, 1, 120, 200); // 150
-    this.max_hunger = map(dna.genes[4], 0, 1, 400, 600); // 500
-    this.mut_rate = map(dna.genes[5], 0, 1, .5, .75); //.25
-    this.split_thresh = map(dna.genes[6], 0, 1, 25, 35); // 30
+    this.top_speed = map(dna.genes[0], 0, 1, 27, 27);
+    this.cell_w = map(dna.genes[1], 0, 1, 18, 18); // 15
+    this.rep_rate = map(dna.genes[2], 0, 1, 10, 10); // 25
+    this.lifespan = map(dna.genes[3], 0, 1, 480, 480); // 150
+    this.max_hunger = map(dna.genes[4], 0, 1, 105, 105); // 500
+    this.mut_rate = map(dna.genes[5], 0, 1, .65, .65); //.25
+    this.split_thresh = map(dna.genes[6], 0, 1, 40, 40); // 30
     this.mass = 64656.70908252886 / (this.cell_w/2 * this.cell_w/2 * this.cell_w/2);
     this.parent = null;
     this.children = new ArrayList<Luca>();
@@ -118,14 +117,13 @@ class Luca
       all_prey.add(this);
     }
     this.rep_prog = 12;
-    this.stam = this.split_thresh;
+    this.stam = this.split_thresh - 10;
     this.col = new_spec_col;
   }
   // Constructor with parameters
   Luca(float x, float y, Luca parent)
   {
     this();
-    this.stam = 0;
     this.loc = new PVector(x, y);
     this.parent = parent;
     parent.children.add(this);
@@ -137,7 +135,7 @@ class Luca
     {
       float offset = 0.1f;
       this.top_speed = map(dna.genes[0], 0, 1, parent.top_speed * (1 - offset), parent.top_speed * (1 + offset));
-      this.cell_w = map(dna.genes[1], 0, 1, parent.cell_w * (1 - offset), parent.cell_w * (1 + offset)); // 15
+      this.cell_w = map(dna.genes[1], 0, 1, parent.cell_w * (1 - .5*offset), parent.cell_w * (1 + .5*offset)); // 15
       this.rep_rate = map(dna.genes[2], 0, 1, parent.rep_rate * (1 - offset), parent.rep_rate * (1 + offset)); // 25
       this.lifespan = map(dna.genes[3], 0, 1, parent.lifespan * (1 - offset), parent.lifespan * (1 + offset)); // 150
       this.max_hunger = map(dna.genes[4], 0, 1, parent.max_hunger * (1 - offset), parent.max_hunger * (1 + offset)); // 500
@@ -145,6 +143,8 @@ class Luca
       this.split_thresh = map(dna.genes[6], 0, 1, parent.split_thresh * (1 - offset), parent.split_thresh * (1 + offset)); // 30
       this.rep_prog = random(0, 3);
     }
+    this.stam = 0;
+    this.rep_prog = 0;
   }
 
   void mutate()
@@ -234,14 +234,14 @@ class Luca
           for(int k = 0; k < 3; k++)
           {
             force = this.flock()[k];
-            force.mult(40);
+            force.mult(14);
             this.applyForce(force);
           }
         }
         else if(!(l2 instanceof Predator))
         {
           force = this.separate();
-          force.mult(8);
+          force.mult(8.5);
           this.applyForce(force);
         }
       }
@@ -250,7 +250,10 @@ class Luca
     force = this.seekClosest();
     if(force != null /*&& this.can_seek*/ && (force.x != 0 && force.y != 0))
     {
-        force.mult(15);
+        float h = map(this.hunger, 0, this.max_hunger, 0, 1);
+        h = constrain(h, .25, this.max_hunger);
+
+        force.mult(h*15);
         this.applyForce(force);
     }
 
@@ -264,7 +267,7 @@ class Luca
     force.limit(this.max_force * this.mass);
 
     // Highest priority
-    force.mult(16);
+    force.mult(23);
     this.applyForce(force);
 
     // Move away from walls
@@ -274,7 +277,7 @@ class Luca
 
       //********** Bigger wall force */
 
-      force.mult(3);
+      force.mult(4);
       this.applyForce(force);
     }
   }
@@ -285,7 +288,7 @@ class Luca
     force.normalize();
     force.mult(this.top_speed);
     force.sub(this.vel);
-    force.limit(2*this.max_force*this.mass);
+    force.limit(this.max_force*this.mass);
     return force;
   }
 
@@ -295,16 +298,16 @@ PVector[] flock()
   PVector ali = align();
   PVector coh = cohesion();
 
-  sep.mult(1.0);
-  ali.mult(3.0);
-  coh.mult(3.0);
+  sep.mult(2.5);
+  ali.mult(3.5);
+  coh.mult(1.8);
 
   return new PVector[]{sep, ali, coh};
 }
 
 PVector cohesion()
 {
-  float neighborDist = 50;
+  float neighborDist = 100;
   sum = new PVector(0, 0);
   int count = 0;
   for(Luca l: all_prey)
@@ -349,7 +352,7 @@ PVector align()
     sum.mult(this.top_speed);
 
     force = sum.sub(this.vel);
-    force.limit(2*this.max_force*this.mass);
+    force.limit(this.max_force*this.mass);
     return force;
   }
   else
@@ -368,25 +371,25 @@ PVector wallForce()
 
   if(this.loc.x > width - margin)
   {
-    float forceStrength = map(this.loc.x, width - margin, width, 0, 2*this.max_force*this.mass);
+    float forceStrength = map(this.loc.x, width - margin, width, 0, this.max_force*this.mass);
     force.add(new PVector(-forceStrength, 0));
     count++;
   }
   else if(this.loc.x < margin)
   {
-    float forceStrength = map(this.loc.x, 0, margin, 2*this.max_force*this.mass, 0);
+    float forceStrength = map(this.loc.x, 0, margin, this.max_force*this.mass, 0);
     force.add(new PVector(forceStrength, 0));
     count++;
   }
   if(this.loc.y > height - margin)
   {
-    float forceStrength = map(this.loc.y, height - margin, height, 0, 2*this.max_force*this.mass);
+    float forceStrength = map(this.loc.y, height - margin, height, 0, this.max_force*this.mass);
     force.add(new PVector(0, -forceStrength));
     count++;
   }
   else if(this.loc.y < margin)
   {
-    float forceStrength = map(this.loc.y, 0, margin, 2*this.max_force*this.mass, 0);
+    float forceStrength = map(this.loc.y, 0, margin, this.max_force*this.mass, 0);
     force.add(new PVector(0, forceStrength));
     count++;
   }
@@ -426,7 +429,7 @@ PVector wallForce()
       force.normalize();
       force.mult(this.top_speed);
       force.sub(this.vel);
-      force.limit(300*this.max_force*this.mass);
+      force.limit(this.max_force*this.mass);
       return force;
     }
     else
@@ -490,7 +493,7 @@ PVector wallForce()
   {
     stroke(0);
     // Calculate the color based on the life_remaining
-    color startColor = color(255, 255, 255); // Red color
+    color startColor = color(0); // Start color of the Luca
     color endColor = this.spec.col; // Original color of the Luca
     float amt = map(this.life_remaining, 0, this.lifespan, 0, 1);
     color interpColor = lerpColor(startColor, endColor, amt);
@@ -697,11 +700,13 @@ PVector wallForce()
   // Split one Luca into two
   Luca split()
   {
-    this.stam *= random(0, .2);
+    this.stam *= random(0, .1);
     this.hunger += random(15, 25);
     this.rep_prog = random(0, 3);
+    //this.life_remaining -= 5;
     // Spawn new luca on top of original
     Luca l2 = this.spawn(this);
+    l2.stam = 0;
     // If the luca's fitness is higher than a random value
 
     l2.loc = new PVector(this.loc.x, this.loc.y);
@@ -952,7 +957,7 @@ PVector wallForce()
   {
     this.acc.limit(max_force * mass);
     force = PVector.add(this.vel, this.acc);
-    this.vel = PVector.lerp(this.vel, force, 0.15);
+    this.vel = PVector.lerp(this.vel, force, 0.10);
     this.vel.limit(this.top_speed);
     this.loc.add(this.vel);
     this.acc.mult(0);

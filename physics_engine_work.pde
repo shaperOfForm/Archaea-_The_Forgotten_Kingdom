@@ -14,6 +14,9 @@ boolean isPaused;
 boolean about;
 
 Species s;
+Species s2;
+//Species s3;
+
 Species predator;
 
 float sin_values[] = new float[360];
@@ -23,12 +26,13 @@ ArrayList<Species> new_species = new ArrayList<Species>();
 ArrayList<Luca> all = new ArrayList<Luca>();
 
 ArrayList<Luca>[][] grid;
-int grid_cell_size = 17;
+int grid_cell_size = 22;
 int cols;
 int rows;
 
 // Set luca limit
-int limit = 75;
+int luca_limit = 75;
+int pred_limit = 15;
 
 void setup()
 {
@@ -82,14 +86,21 @@ void setup()
   
   s = new Species();
 
+  s2 = new Species();
+  s2.all_in_species.get(0).loc = new PVector(width - 100, 100);
+
+  //s3 = new Species();
+  //s3.all_in_species.get(0).loc = new PVector(100, height - 100);
+
   predator = new Species(1);
 
   e.biome = new Biome();
 
   e.biome.b.add(s);
+  e.biome.b.add(s2);
+  //e.biome.b.add(s3);
 
   e.biome.b.add(predator);
-  
   
 }
 

@@ -10,7 +10,7 @@ class Food
 
   Food()
   {
-    this.loc = new PVector(random(15, width-15), random(65, height-15));
+    this.loc = new PVector(random(20, width-20), random(70, height-20));
     this.mass = random(4, 12);
     //println(food_img.width, food_img.height);
     this.food_img = food_imgs[int(random(0, food_imgs.length))];
@@ -37,7 +37,7 @@ class Food
   {
     for(Luca luca: all)
     {
-      if(PVector.dist(this.loc, luca.loc) < luca.cell_w - this.mass + 5 && luca.cell_w > this.mass)
+      if(PVector.dist(this.loc, luca.loc) < luca.cell_w - this.mass + 8 && luca.cell_w > this.mass)
       {
         
         if(luca instanceof Predator)
@@ -47,8 +47,8 @@ class Food
         }
         else
         {
-          luca.hunger -= this.mass;
-          luca.stam += this.mass;
+          luca.hunger -= 1.25*this.mass;
+          luca.stam += 1.25*this.mass;
         }
         luca.food_eaten++;
         /*
