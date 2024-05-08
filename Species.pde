@@ -95,24 +95,18 @@ class Species
     //this.all_in_species.add(l);
     Luca l2 = l.spawn(l);
 
-    println("Species created from Luca");
+l2.spec = this;
+
   // Remove l2 from its current species and add it to the new species
   if (l2.spec != null) 
   {
     l2.spec.all_in_species.remove(l2);
   }
-  l2.spec = this;
   this.all_in_species.add(l2);
+  
+  
 
-  // Remove l from its current species and add it to the new species
-  if (l.spec != null) {
-      l.spec.all_in_species.remove(l);
-  }
-  l.spec = this;
-  this.all_in_species.add(l);
-
-  println("Species created from Luca");    //l.spec.all_in_species.remove(l);
-    //this.all_in_species.add(l);
+  println("Species created from Luca");
   }
 
   void run()
@@ -154,7 +148,7 @@ class Species
         temp = new ArrayList<Luca>(all_predators);
       }
       // If there are less lucas than the limit
-      if((temp.size() < limit || (l.spec.all_in_species.size() < 5) && !(l instanceof Predator)) && l.stam >= l.split_thresh && l.rep_prog >= l.rep_rate)
+      if(temp.size() < limit && l.stam >= l.split_thresh && l.rep_prog >= l.rep_rate)
       {
         Luca new_luca;
         // Replicate

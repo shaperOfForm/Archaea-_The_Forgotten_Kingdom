@@ -31,7 +31,7 @@ int cols;
 int rows;
 
 // Set luca limit
-int luca_limit = 75;
+int luca_limit = 50;
 int pred_limit = 15;
 
 void setup()

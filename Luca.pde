@@ -234,14 +234,14 @@ class Luca
           for(int k = 0; k < 3; k++)
           {
             force = this.flock()[k];
-            force.mult(14);
+            force.mult(12);
             this.applyForce(force);
           }
         }
         else if(!(l2 instanceof Predator))
         {
           force = this.separate();
-          force.mult(8.5);
+          force.mult(4);
           this.applyForce(force);
         }
       }
@@ -251,7 +251,7 @@ class Luca
     if(force != null /*&& this.can_seek*/ && (force.x != 0 && force.y != 0))
     {
         float h = map(this.hunger, 0, this.max_hunger, 0, 1);
-        h = constrain(h, .25, this.max_hunger);
+        h = constrain(h, .5, this.max_hunger);
 
         force.mult(h*15);
         this.applyForce(force);

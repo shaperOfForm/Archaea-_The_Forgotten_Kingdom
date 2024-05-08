@@ -19,7 +19,7 @@ class Biome
             s.run();
             if(s.all_in_species.size() > 0 && !(s.all_in_species.get(0) instanceof Predator))
             {
-                if(all_prey.size() >= 2 && all_prey.size() <= 4)
+                if(e.biome.b.size() < 3)
                 {
                     new_spec = s.speciate(all_prey.get(0));
                     new_lucas.add(all_prey.get(0));
