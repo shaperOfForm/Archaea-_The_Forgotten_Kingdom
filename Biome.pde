@@ -12,6 +12,7 @@ class Biome
 
     void run()
     {
+
         Iterator<Species> it = b.iterator();
         while(it.hasNext())
         {
@@ -57,8 +58,22 @@ class Biome
             //new_species.all_in_species.addAll(new_lucas);
             b.add(new_spec);
             //new_species = null;
+            new_spec.run();
         }
         //e.biome.b.run();
         new_spec = null;
+
+        boolean spawn_pred = true;
+        for(Species s: b)
+        {
+            if(s != null && s.all_in_species.size() != 0 && s.all_in_species.get(0) instanceof Predator)
+            {
+                spawn_pred = false;
+            }
+        }
+        if(spawn_pred)
+        {
+            b.add(new Species(1));
+        }
     }
 }

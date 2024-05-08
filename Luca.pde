@@ -73,6 +73,13 @@ class Luca
   
   color col;
 
+  float seek_force;
+
+  float sense_range;
+
+  float flock_force;
+
+
   DNA dna;
 
   // Default constructor
@@ -90,13 +97,16 @@ class Luca
     
     // If the luca's go in circles around food, increase max_force
 
-    this.top_speed = map(dna.genes[0], 0, 1, 27, 27);
+    this.top_speed = map(dna.genes[0], 0, 1, 26, 26);
     this.cell_w = map(dna.genes[1], 0, 1, 18, 18); // 15
     this.rep_rate = map(dna.genes[2], 0, 1, 10, 10); // 25
     this.lifespan = map(dna.genes[3], 0, 1, 480, 480); // 150
-    this.max_hunger = map(dna.genes[4], 0, 1, 105, 105); // 500
+    this.max_hunger = map(dna.genes[4], 0, 1, 55, 55); // 500
     this.mut_rate = map(dna.genes[5], 0, 1, .65, .65); //.25
-    this.split_thresh = map(dna.genes[6], 0, 1, 40, 40); // 30
+    this.split_thresh = map(dna.genes[6], 0, 1, 50, 50); // 30
+    this.seek_force = map(dna.genes[7], 0, 1, 15, 15);
+    this.sense_range = map(dna.genes[8], 0, 1, 500, 500);
+    this.flock_force = map(dna.genes[9], 0, 1, 12, 12);
     this.mass = 64656.70908252886 / (this.cell_w/2 * this.cell_w/2 * this.cell_w/2);
     this.parent = null;
     this.children = new ArrayList<Luca>();
@@ -141,6 +151,9 @@ class Luca
       this.max_hunger = map(dna.genes[4], 0, 1, parent.max_hunger * (1 - offset), parent.max_hunger * (1 + offset)); // 500
       this.mut_rate = map(dna.genes[5], 0, 1, parent.mut_rate * (1 - offset), parent.mut_rate * (1 + offset)); //.25
       this.split_thresh = map(dna.genes[6], 0, 1, parent.split_thresh * (1 - offset), parent.split_thresh * (1 + offset)); // 30
+      this.seek_force = map(dna.genes[7], 0, 1, parent.seek_force * (1 - .1*offset), parent.seek_force * (1 + .1*offset));
+      this.sense_range = map(dna.genes[8], 0, 1, parent.sense_range * (1 - .1*offset), parent.sense_range * (1 + .1*offset));
+      this.flock_force = map(dna.genes[9], 0, 1, parent.flock_force * (1 - .1*offset), parent.flock_force * (1 + .1*offset));
       this.rep_prog = random(0, 3);
     }
     this.stam = 0;
@@ -234,7 +247,7 @@ class Luca
           for(int k = 0; k < 3; k++)
           {
             force = this.flock()[k];
-            force.mult(12);
+            force.mult(this.flock_force);
             this.applyForce(force);
           }
         }
@@ -253,7 +266,7 @@ class Luca
         float h = map(this.hunger, 0, this.max_hunger, 0, 1);
         h = constrain(h, .5, this.max_hunger);
 
-        force.mult(h*15);
+        force.mult(h*this.seek_force);
         this.applyForce(force);
     }
 
@@ -267,7 +280,7 @@ class Luca
     force.limit(this.max_force * this.mass);
 
     // Highest priority
-    force.mult(23);
+    force.mult(19);
     this.applyForce(force);
 
     // Move away from walls
@@ -298,9 +311,9 @@ PVector[] flock()
   PVector ali = align();
   PVector coh = cohesion();
 
-  sep.mult(2.5);
+  sep.mult(1.9);
   ali.mult(3.5);
-  coh.mult(1.8);
+  coh.mult(2.0);
 
   return new PVector[]{sep, ali, coh};
 }

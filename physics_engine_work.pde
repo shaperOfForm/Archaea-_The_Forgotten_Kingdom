@@ -93,6 +93,7 @@ void setup()
   //s3.all_in_species.get(0).loc = new PVector(100, height - 100);
 
   predator = new Species(1);
+  predator.all_in_species.get(0).loc = new PVector(400, height/2);
 
   e.biome = new Biome();
 
