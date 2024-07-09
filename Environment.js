@@ -1,9 +1,10 @@
-
+import Food from "./Food.js";
+import Biome from "./Biome.js";
 /**
     *Environment class
     A class to manage the creation and deletion of food objects in the environment
  */
-class Environment {
+export default class Environment {
   constructor() {
     // Initialize all food as an empty array
     this.all_food = [];

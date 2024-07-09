@@ -1,10 +1,30 @@
-
+import DNA from './DNA.js';
+import Predator from './Predator.js';
+import { all_prey } from './Archaea.js';
+import { all_predators } from './Archaea.js';
+import { grid } from './Archaea.js';
+import { all } from './Archaea.js';
+import { e } from './Archaea.js';
+import { new_spec_col } from './Archaea.js';
+import { all_food } from './Archaea.js';
+import { grid_cell_size } from './Archaea.js';
+import { cols } from './Archaea.js';
+import { rows } from './Archaea.js';
+import { luca_limit } from './Archaea.js';
+import { pred_limit } from './Archaea.js';
+import { food_imgs } from './Archaea.js';
+import { random } from './p5.js';
+import { constrain } from './p5.js';
+import { map } from './p5.js';
+import { createVector } from './p5.js';
+import { dist } from './p5.js';
+import { random } from './p5.js';
 
 /**
   *Luca class
   A class to create Luca objects (cells) and provide all of its functionality
  */
-class Luca
+export default class Luca
 {
 
   /**

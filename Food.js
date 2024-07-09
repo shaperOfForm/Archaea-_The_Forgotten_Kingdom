@@ -1,7 +1,8 @@
-
+import { food_imgs } from './sketch.js';
+import Predator from './Predator.js';
 // Class for food objects
 
-class Food {
+export default class Food {
   constructor() {
     // Random location
     this.loc = createVector(random(20, width - 20), random(70, height - 20));

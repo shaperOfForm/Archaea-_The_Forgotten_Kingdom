@@ -1,9 +1,11 @@
-
+import Species from './Species.js';
+import Predator from './Predator.js';
+import { allPrey } from './Archaea.js';
 /**
     *Biome class
     For managing the species in the biome
  */
-class Biome {
+export default class Biome {
   constructor() {
     this.speciesList = []; // Array of Species
     this.newLucas = []; // Array of Luca instances to be added to a new species

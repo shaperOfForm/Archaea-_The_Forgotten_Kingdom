@@ -1,6 +1,7 @@
+import Luca from './Luca.js';
+import Predator from './Predator.js';
 
-
-class Species {
+export default class Species {
   constructor(luca = null, isPredator = false) {
     // Initialize attributes
     this.col = color(random(255), random(255), random(255));

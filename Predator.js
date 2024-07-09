@@ -1,4 +1,4 @@
-
+import Luca from './Luca.js';
 // I did not have time to properly adjust the starting attributes to ensure that all the predators and prey don't die right away, or the prey in the long run
 // The limit on the number of predators got it to a point where it was presentable
 
@@ -6,7 +6,7 @@
     *Prdator class
     This class extends the Luca class and is used to create predators in the simulation
  */
-class Predator extends Luca {
+export default class Predator extends Luca {
   constructor(x, y, parent = null) {
     super(x, y, parent); // Assuming Luca's constructor accepts x, y, and parent parameters
     this.closest_prey = null;

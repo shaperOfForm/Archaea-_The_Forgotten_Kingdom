@@ -1,4 +1,10 @@
-
+import Food from './Food.js';
+import Environment from './Environment.js';
+import Biome from './Biome.js';
+import Species from'./Species.js'
+import DNA from'./DNA.js';
+import Luca from './Luca.js';
+import Predator from './Predator.js';
 
 // Remove import statements for p5
 

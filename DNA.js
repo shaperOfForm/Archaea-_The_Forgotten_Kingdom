@@ -1,10 +1,10 @@
-
+import { random } from "./utils.js";
 /**
  * DNA class for the predator and luca
  * Contains the genes of the predator and luca
  * A class to simulate DNA via heredity and random mutation
  */
-class DNA {
+export default class DNA {
   /**
    * Constructor for DNA with random genes
    */
