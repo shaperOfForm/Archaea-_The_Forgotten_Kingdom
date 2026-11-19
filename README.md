@@ -1,5 +1,5 @@
 # Archaea
-Virtual Ecosystem Simulation
+Virtual Ecosystem Simulation (unfinished)
 
 ## Running the Simulation
 
