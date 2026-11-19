@@ -63,7 +63,7 @@ If the sketch fails to launch, verify that you're running the command from the s
 
 ## General Description
 
-This educational simulation promotes awareness of major theories in the fields of Population Biology, Microbiology and Evolutionary Studies and demonstrates the applicability of Computer Science to the natural world. It contains a genetic algorithm and simulates the natural variation between species and between individuals of the same species.
+This educational simulation promotes awareness of major theories in the fields of Population Biology, Microbiology and Evolutionary Studies and demonstrates the applicability of Computer Science to the natural world. It contains a genetic algorithm (that plays out in front of your eyes) and simulates the natural variation between species and between individuals of the same species.
 
 Archaea simulates, tracks, and displays aspects of life on a microbiological scale. The cells, or LUCAs (“Last Universal Common Ancestor”) will start off extremely simple in terms of traits and behaviors, and progressively complexify as they adapt, mutate new traits, and are acted upon by environmental pressures. Simulating an environment with finite resources drives competition to procure those resources, survive in the environment, and reproduce, causing the LUCAs to adapt and change over time. The cells are programmed with needs, and priorities in terms of which needs need to be met at any given time. As two simulations will never play out exactly the same, users will basically be culturing their own petri dish, with a front row seat to observe from.
 
