@@ -501,68 +501,67 @@ PVector wallForce()
     return sum;
   }
 
-  // Display the luca
-  void drawLuca()
+
+void drawLuca()
+{
+  stroke(0);
+
+  // Calculate color based on remaining life
+  color startColor = color(0);
+  color endColor = this.spec.col;
+  float amt = map(this.life_remaining, 0, this.lifespan, 0, 1);
+  color interpColor = lerpColor(startColor, endColor, amt);
+  fill(interpColor);
+
+  if (!isPaused)
   {
-    stroke(0);
-    // Calculate the color based on the life_remaining
-    color startColor = color(0); // Start color of the Luca
-    color endColor = this.spec.col; // Original color of the Luca
-    float amt = map(this.life_remaining, 0, this.lifespan, 0, 1);
-    color interpColor = lerpColor(startColor, endColor, amt);
-    fill(interpColor); // Apply the color fill to the shape
     beginShape();
-    if(!isPaused)
+
+    for (float i = 0; i < TWO_PI; i += 0.2)
     {
-      for (float i = 0; i < TWO_PI; i = i + 0.2)
-      {
-        int index = int(degrees(i)) % 360;
-        // Create edge of circle using sine and cosine
-        float x1 = sin_values[index] * this.cell_w;
-        float y1 = cos_values[index] * this.cell_w;
-  /*
-        // Map the relative position of the vertex within the shape to the exact range of the image dimensions
-              float u = map(x1, -1.2*this.cell_w, 1.2*this.cell_w, 0, this.cell_w);
-              float v = map(y1, -1.2*this.cell_w, 1.2*this.cell_w, 0, this.cell_w-0); // Use height instead of width
+      int index = int(degrees(i)) % 360;
 
-              // Add noise to the texture coordinates
-              u += sin(u * 0.001) * 100; // Scale down the value passed into the noise function
-              v += sin(v * 0.001) * 100; // Scale down the value passed into the noise function
-  */
-        // Get a random offset
-        float xOffset = random(-1.25, 1.25);
-        float yOffset = random(-1.25, 1.25);
+      // Create animated edges
+      float x1 = sin_values[index] * this.cell_w;
+      float y1 = cos_values[index] * this.cell_w;
 
-        // Add the offset to the edge coordinates
-        x1 += this.loc.x + xOffset;
-        y1 += this.loc.y + yOffset;
+      float xOffset = random(-1.25, 1.25);
+      float yOffset = random(-1.25, 1.25);
 
-        // Create a curved line between the vertices
-        curveVertex(x1, y1);
-      }
-    endShape(CLOSE);
-    noFill();
+      x1 += this.loc.x + xOffset;
+      y1 += this.loc.y + yOffset;
+
+      curveVertex(x1, y1);
     }
-    
-    // Draw a circular progress bar for the hunger level
-    stroke(0, 255, 0); // Red color for the progress bar
-    strokeWeight(4); // Make the progress bar a bit thicker
-    noFill(); // No fill for the progress bar
-    float hungerAngle = map(this.hunger, 0, this.max_hunger, PI, 0); // Map the hunger level to an angle
-    arc(this.loc.x, this.loc.y, this.cell_w * 2, this.cell_w * 2, -HALF_PI, -HALF_PI + hungerAngle); // Draw the progress bar
-    strokeWeight(4); // Reset the stroke weight
-    stroke(0); // Reset the stroke color
 
-    // Draw a circular progress bar for the stamina level
-    stroke(255, 210, 0); // Blue color for the progress bar
-    float staminaAngle = map(this.stam, 0, this.split_thresh, 0, PI); // Map the stamina level to an angle
-    arc(this.loc.x, this.loc.y, this.cell_w * 2, this.cell_w * 2, HALF_PI, HALF_PI + staminaAngle); // Draw the progress bar
-
-    strokeWeight(1); // Reset the stroke weight
-    stroke(0); // Reset the stroke color
-    //stroke(this.spec.col);
-    //ellipse(0,0,radius*2,radius*2);
+    endShape(CLOSE);
   }
+
+  // Position progress meters outside the animated edges
+  float meterRadius = this.cell_w + 6;
+  float meterDiameter = meterRadius * 2;
+
+  noFill();
+  strokeWeight(3);
+
+  // Hunger progress meter (top half)
+  stroke(0, 255, 0);
+  float hungerAngle = map(this.hunger, 0, this.max_hunger, PI, 0);
+  arc(this.loc.x, this.loc.y,
+      meterDiameter, meterDiameter,
+      -HALF_PI, -HALF_PI + hungerAngle);
+
+  // Stamina progress meter (bottom half)
+  stroke(255, 210, 0);
+  float staminaAngle = map(this.stam, 0, this.split_thresh, 0, PI);
+  arc(this.loc.x, this.loc.y,
+      meterDiameter, meterDiameter,
+      HALF_PI, HALF_PI + staminaAngle);
+
+  // Reset drawing settings
+  strokeWeight(1);
+  stroke(0);
+}
 
   /*
   // The switch-case for mutations
